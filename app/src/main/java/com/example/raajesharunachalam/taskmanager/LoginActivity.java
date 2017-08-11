@@ -15,9 +15,9 @@ public class LoginActivity extends AppCompatActivity {
     public void validatepassword()
     {
         EditText emailfield = (EditText) findViewById(R.id.emailfield);
-        String email = "" + emailfield.getText();
+        String email = emailfield.getText().toString();
 
         EditText passwordfield = (EditText) findViewById(R.id.passwordfield);
-        String password = "" + passwordfield.getText();
+        String password = passwordfield.getText().toString();
     }
 }
