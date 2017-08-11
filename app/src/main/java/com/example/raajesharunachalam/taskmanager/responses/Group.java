@@ -12,4 +12,12 @@ public class Group {
 
     @SerializedName("group_name")
     private String groupName;
+
+    public int getGroupId(){
+        return gid;
+    }
+
+    public String getGroupName(){
+        return groupName;
+    }
 }
