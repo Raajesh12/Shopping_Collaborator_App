@@ -22,6 +22,8 @@
         <activity
             android:name=".SignUpPage"
             android:label="Sign Up Page" />
+        <activity android:name=".GroupsActivity"></activity>
+        <activity android:name=".TasksActivity"></activity>
     </application>
 
 </manifest>
