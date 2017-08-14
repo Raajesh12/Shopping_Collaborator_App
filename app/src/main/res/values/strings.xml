@@ -5,4 +5,5 @@
     <string name="call_failed">Call Failed. Try Again!</string>
     <string name="invalid_credentials">Login Credentials Incorrect. Try Again!</string>
     <string name="fields_blank">You Have Left One Or More Field Blank! Please Fill Them In And Try Again!</string>
+    <string name="email_not_unique">Email already used!</string>
 </resources>
