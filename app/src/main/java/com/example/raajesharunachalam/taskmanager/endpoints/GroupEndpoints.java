@@ -12,6 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -22,15 +23,19 @@ import retrofit2.http.Query;
  */
 
 public interface GroupEndpoints {
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @GET("/groups")
     Call<GroupListResponse> getGroups(@Query("uid") int uid);
 
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/groups/")
     Call<GIDResponse> createGroup(@Body CreateGroupRequest createGroupRequest);
 
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @PUT("/groups/{gid}")
     Call<Void> updateGroup(@Path("gid") int gid, @Body UpdateGroupRequest updateGroupRequest);
 
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/groups/{gid}")
     Call<Void> deleteGroup(@Path("gid") int gid);
 
