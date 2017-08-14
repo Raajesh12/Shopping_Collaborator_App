@@ -51,14 +51,14 @@ public class SignUpPage extends AppCompatActivity {
             @Override
             public void onResponse(Call<UIDResponse> call, Response<UIDResponse> response) {
                 if (response.code() == ResponseCodes.HTTP_BAD_REQUEST) {
-                    Toast.makeText(SignUpPage.this, "Email already used!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SignUpPage.this, R.string.email_not_unique, Toast.LENGTH_LONG).show();
                 } else if (response.code() == ResponseCodes.HTTP_SERVER_ERROR) {
-                    Toast.makeText(SignUpPage.this, "Server error.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(SignUpPage.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 } else if (response.code() == ResponseCodes.HTTP_CREATED) {
                     UIDResponse uidObject = response.body();
                     int uid = (int) uidObject.getUid();
                     Intent intent = new Intent(SignUpPage.this, GroupsActivity.class);
-                    intent.putExtra("uid", IntentKeys.UID);
+                    intent.putExtra(IntentKeys.UID, uid);
                     startActivity(intent);
                 }
 
