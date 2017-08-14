@@ -40,7 +40,7 @@ public interface GroupEndpoints {
     Call<Void> deleteGroup(@Path("gid") int gid);
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://taskmanager.host")
+            .baseUrl("http://taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

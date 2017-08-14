@@ -43,7 +43,7 @@ public interface UserEndpoints {
     Call<UIDResponse> validateUser(@Body ValidateUserRequest validateUserRequest);
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://taskmanager.host")
+            .baseUrl("http://taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

@@ -40,7 +40,7 @@ public interface TaskEndpoints {
     Call<Void> deleteTask(@Path("taskId") int taskId);
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://taskmanager.host")
+            .baseUrl("http://taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
