@@ -1,6 +1,7 @@
 package com.example.raajesharunachalam.taskmanager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -13,11 +14,14 @@ import android.widget.TextView;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
 
 public class GroupsActivity extends AppCompatActivity {
+    public static int uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
+        Intent intent = getIntent();
+        uid = intent.getIntExtra(IntentKeys.UID, 0);
     }
 
     public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder>

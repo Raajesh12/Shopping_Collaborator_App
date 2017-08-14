@@ -68,7 +68,7 @@ public class SignUpPage extends AppCompatActivity {
             @Override
             public void onFailure(Call<UIDResponse> call, Throwable t) {
 
-                Toast.makeText(SignUpPage.this, "Network Error, try again.", Toast.LENGTH_LONG).show();
+                Toast.makeText(SignUpPage.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
 
