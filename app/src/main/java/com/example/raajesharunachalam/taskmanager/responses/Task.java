@@ -7,6 +7,9 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Task {
+    @SerializedName("task_id")
+    private long taskId;
+
     @SerializedName("first_name")
     private String firstName;
 
@@ -15,6 +18,8 @@ public class Task {
 
     @SerializedName("task_description")
     private String taskDescription;
+
+    public long getTaskId() {return taskId;}
 
     public String getFirstName() {
         return firstName;
