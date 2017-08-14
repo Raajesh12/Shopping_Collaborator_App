@@ -34,7 +34,7 @@ public interface UserEndpoints {
     Call<Void> deleteUser(@Path("uid") int uid);
 
     @POST("/validate_user")
-    Call<Void> validateUser(@Body ValidateUserRequest validateUserRequest);
+    Call<UIDResponse> validateUser(@Body ValidateUserRequest validateUserRequest);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://taskmanager.host")
