@@ -25,7 +25,7 @@ import retrofit2.http.Query;
 public interface TaskEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @GET("/tasks")
-    Call<TaskListResponse> getTasks(@Query("gid") int gid);
+    Call<TaskListResponse> getTasks(@Query("gid") long gid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/tasks")

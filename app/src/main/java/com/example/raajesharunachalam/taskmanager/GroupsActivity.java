@@ -92,16 +92,16 @@ public class GroupsActivity extends AppCompatActivity {
         public void onBindViewHolder(final GroupsAdapter.ViewHolder viewHolder, int position) {
             Group aGroup = groups[position];
             viewHolder.groupName.setText(aGroup.getGroupName());
-            Integer integer = new Integer(aGroup.getGroupId());
-            viewHolder.itemView.setTag(position, integer);
+            Long longer = new Long(aGroup.getGroupId());
+            viewHolder.itemView.setTag(position, longer);
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(GroupsActivity.this, TasksActivity.class);
-                    Integer integer = (Integer) viewHolder.itemView.getTag();
+                    Long longer = (Long) viewHolder.itemView.getTag();
 
-                    int groupId = integer.intValue();
+                    long groupId = longer.longValue();
                     intent.putExtra(IntentKeys.GID, groupId);
 
                     startActivity(intent);
