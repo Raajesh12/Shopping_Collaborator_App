@@ -9,4 +9,8 @@ import com.google.gson.annotations.SerializedName;
 public class TaskIDResponse {
     @SerializedName("id")
     private int taskId;
+
+    public int getTaskId(){
+        return taskId;
+    }
 }

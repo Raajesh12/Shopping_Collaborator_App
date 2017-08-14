@@ -9,4 +9,8 @@ import com.google.gson.annotations.SerializedName;
 public class GroupListResponse {
     @SerializedName("groups")
     private Group[] groups;
+
+    public Group[] getGroups(){
+        return groups;
+    }
 }
