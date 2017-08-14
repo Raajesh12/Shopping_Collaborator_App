@@ -6,9 +6,9 @@
     android:layout_height="match_parent"
     tools:context="com.example.raajesharunachalam.taskmanager.GroupsActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycleGroups"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/recycleGroups"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
 
 </android.support.constraint.ConstraintLayout>
