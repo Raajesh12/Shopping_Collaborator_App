@@ -8,12 +8,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class Group {
     @SerializedName("gid")
-    private int gid;
+    private long gid;
 
     @SerializedName("group_name")
     private String groupName;
 
-    public int getGroupId(){
+    public long getGroupId(){
         return gid;
     }
 
