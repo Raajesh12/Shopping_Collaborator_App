@@ -1,5 +1,6 @@
 package com.example.raajesharunachalam.taskmanager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -55,8 +56,8 @@ public class TasksActivity extends AppCompatActivity {
                     TasksActivity.TasksAdapter tasksAdapter = new TasksActivity.TasksAdapter(tasks);
                     rv.setAdapter(tasksAdapter);
 
-                    Log.d("ResponseInfo", "Code: " + String.valueOf(response.code()));
-                    Log.d("ResponseInfo", "Task Length: " + String.valueOf(tasks.length));
+                    Log.d("TaskResponseInfo", "Code: " + String.valueOf(response.code()));
+                    Log.d("TaskResponseInfo", "Task Length: " + String.valueOf(tasks.length));
                 } else {
                     Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
@@ -78,8 +79,11 @@ public class TasksActivity extends AppCompatActivity {
 
         @Override
         public TasksViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(TasksActivity.this);
-            View view = inflater.inflate(R.layout.task_item, parent, false);
+            Context context = TasksActivity.this;
+            LayoutInflater myInflater = LayoutInflater.from(context);
+
+            View view = myInflater.inflate(R.layout.task_item, parent, false);
+
             TasksViewHolder viewHolder = new TasksViewHolder(view);
             return viewHolder;
         }
@@ -87,9 +91,11 @@ public class TasksActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(TasksViewHolder holder, int position) {
             Task task = tasks[position];
-            holder.taskDescription.setText(task.getTaskDescription());
-            String name = task.getFirstName() + " " + task.getLastName();
-            holder.taskAuthor.setText(name);
+            if(task.getTaskDescription() != null) {
+                holder.taskDescription.setText(task.getTaskDescription());
+                String name = task.getFirstName() + " " + task.getLastName();
+                holder.taskAuthor.setText(name);
+            }
         }
 
         @Override
@@ -98,12 +104,12 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         public class TasksViewHolder extends RecyclerView.ViewHolder{
-            TextView taskDescription;
-            TextView taskAuthor;
+            public TextView taskDescription;
+            public TextView taskAuthor;
             public TasksViewHolder(View itemView) {
                 super(itemView);
-                taskDescription = (TextView) findViewById(R.id.task_description);
-                taskAuthor = (TextView) findViewById(R.id.task_author);
+                taskDescription = (TextView) itemView.findViewById(R.id.task_description);
+                taskAuthor = (TextView) itemView.findViewById(R.id.task_author);
             }
         }
     }

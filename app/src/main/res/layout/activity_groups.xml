@@ -7,8 +7,13 @@
     tools:context="com.example.raajesharunachalam.taskmanager.GroupsActivity">
 
     <android.support.v7.widget.RecyclerView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
         android:id="@+id/recycleGroups"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp" />
 
 </android.support.constraint.ConstraintLayout>

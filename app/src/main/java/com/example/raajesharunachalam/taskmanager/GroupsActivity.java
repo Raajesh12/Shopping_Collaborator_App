@@ -51,9 +51,6 @@ public class GroupsActivity extends AppCompatActivity {
                     Group[] groups = response.body().getGroups();
                     GroupsAdapter groupsAdapter = new GroupsAdapter(groups);
                     rv.setAdapter(groupsAdapter);
-
-                    Log.d("ResponseInfo", "Code: " + String.valueOf(response.code()));
-                    Log.d("ResponseInfo", "Group Length: " + String.valueOf(groups.length));
                 } else {
                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
@@ -77,12 +74,10 @@ public class GroupsActivity extends AppCompatActivity {
 
         @Override
         public GroupsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = parent.getContext();
+            Context context = GroupsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
-
             View groupView = myInflater.inflate(R.layout.group_item, parent, false);
-
 
             ViewHolder viewHolder = new ViewHolder(groupView);
             return viewHolder;
@@ -93,7 +88,7 @@ public class GroupsActivity extends AppCompatActivity {
             Group aGroup = groups[position];
             viewHolder.groupName.setText(aGroup.getGroupName());
             Long longer = new Long(aGroup.getGroupId());
-            viewHolder.itemView.setTag(position, longer);
+            viewHolder.itemView.setTag(longer);
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
