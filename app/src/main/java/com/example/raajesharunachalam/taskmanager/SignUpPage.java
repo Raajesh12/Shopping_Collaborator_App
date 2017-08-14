@@ -45,6 +45,11 @@ public class SignUpPage extends AppCompatActivity {
         EditText passwordfield = (EditText) findViewById(R.id.passwordfield);
         String password = passwordfield.getText().toString();
 
+        if (first_name.length() == 0 || last_name.length() == 0 || email.length() == 0 || password.length() == 0) {
+            Toast.makeText(this, R.string.fields_blank, Toast.LENGTH_LONG).show();
+            return;
+        }
+
         CreateUserRequest request = new CreateUserRequest(first_name, last_name, email, password);
         Call<UIDResponse> call = UserEndpoints.userEndpoints.createUser(request);
         call.enqueue(new Callback<UIDResponse>() {
