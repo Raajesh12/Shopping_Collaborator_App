@@ -25,7 +25,7 @@ import retrofit2.http.Query;
 public interface GroupEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @GET("/groups")
-    Call<GroupListResponse> getGroups(@Query("uid") int uid);
+    Call<GroupListResponse> getGroups(@Query("uid") long uid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/groups/")

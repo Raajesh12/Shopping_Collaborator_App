@@ -61,7 +61,7 @@ public class SignUpPage extends AppCompatActivity {
                     Toast.makeText(SignUpPage.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 } else if (response.code() == ResponseCodes.HTTP_CREATED) {
                     UIDResponse uidObject = response.body();
-                    int uid = (int) uidObject.getUid();
+                    long uid = uidObject.getUid();
                     Intent intent = new Intent(SignUpPage.this, GroupsActivity.class);
                     intent.putExtra(IntentKeys.UID, uid);
                     startActivity(intent);
