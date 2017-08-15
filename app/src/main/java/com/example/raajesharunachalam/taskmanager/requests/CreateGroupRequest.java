@@ -8,13 +8,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class CreateGroupRequest {
 
-    public CreateGroupRequest(int uid, String groupName){
+    public CreateGroupRequest(long uid, String groupName){
         this.uid = uid;
         this.groupName = groupName;
     }
 
     @SerializedName("uid")
-    private int uid;
+    private long uid;
 
     @SerializedName("group_name")
     private String groupName;
