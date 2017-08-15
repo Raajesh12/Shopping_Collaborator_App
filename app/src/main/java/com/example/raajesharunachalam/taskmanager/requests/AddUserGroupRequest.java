@@ -7,13 +7,13 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class AddUserGroupRequest {
-    public AddUserGroupRequest(int gid, String userEmail) {
+    public AddUserGroupRequest(long gid, String userEmail) {
         this.gid = gid;
         this.userEmail = userEmail;
     }
 
     @SerializedName("gid")
-    private int gid;
+    private long gid;
 
     @SerializedName("user_email")
     private String userEmail;
