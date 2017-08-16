@@ -6,4 +6,16 @@
     android:layout_height="match_parent"
     tools:context="com.example.raajesharunachalam.taskmanager.UsersInGroupActivity">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_group_users"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp">
+
+    </android.support.v7.widget.RecyclerView>
+
 </android.support.constraint.ConstraintLayout>

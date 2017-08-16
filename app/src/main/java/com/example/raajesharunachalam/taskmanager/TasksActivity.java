@@ -116,6 +116,7 @@ public class TasksActivity extends AppCompatActivity {
                 return true;
             case R.id.view_users:
                 Intent intent = new Intent(TasksActivity.this, UsersInGroupActivity.class);
+                intent.putExtra(IntentKeys.GID, gid);
                 startActivity(intent);
                 return true;
             default:
