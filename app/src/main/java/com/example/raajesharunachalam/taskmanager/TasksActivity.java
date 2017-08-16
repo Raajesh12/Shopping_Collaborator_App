@@ -1,25 +1,40 @@
 package com.example.raajesharunachalam.taskmanager;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.icu.text.IDNA;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
+import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
+import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
+import com.example.raajesharunachalam.taskmanager.responses.ErrorResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Task;
 import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
 
+import java.io.IOException;
+
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,6 +43,7 @@ public class TasksActivity extends AppCompatActivity {
 
     public static long gid;
     RecyclerView rv;
+    TasksAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +55,67 @@ public class TasksActivity extends AppCompatActivity {
         rv = (RecyclerView) findViewById(R.id.recycle_tasks);
 
         initializeRecyclerView(gid);
+
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inf = getMenuInflater();
+        inf.inflate(R.menu.tasks_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.add_user:
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle(R.string.add_user);
+                dialog.setMessage(R.string.add_user_to_group_message);
+                final EditText input = new EditText(TasksActivity.this);
+                FrameLayout container = new FrameLayout(TasksActivity.this);
+                FrameLayout.LayoutParams params =
+                        new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.topMargin = 50;
+                params.leftMargin = 100;
+                params.rightMargin = 100;
+                params.bottomMargin = 50;
+                input.setLayoutParams(params);
+                container.addView(input);
+                dialog.setView(container);
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String userEmail = input.getText().toString();
+                        AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
+                        Call<ErrorResponse> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
+                        call.enqueue(new Callback<ErrorResponse>() {
+                            @Override
+                            public void onResponse(Call<ErrorResponse> call, Response<ErrorResponse> response) {
+                                if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
+                                    Toast.makeText(TasksActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
+                                }
+                                resetRecyclerView(gid);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ErrorResponse> call, Throwable t) {
+                                Toast.makeText(TasksActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                    }
+                });
+
+                return true;
+            case R.id.view_users:
+                //method
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
     }
 
@@ -53,13 +130,33 @@ public class TasksActivity extends AppCompatActivity {
                     rv.setLayoutManager(layoutManager);
 
                     Task[] tasks = response.body().getTasks();
-                    TasksActivity.TasksAdapter tasksAdapter = new TasksActivity.TasksAdapter(tasks);
-                    rv.setAdapter(tasksAdapter);
-
-                    Log.d("TaskResponseInfo", "Code: " + String.valueOf(response.code()));
-                    Log.d("TaskResponseInfo", "Task Length: " + String.valueOf(tasks.length));
+                    adapter = new TasksActivity.TasksAdapter(tasks);
+                    rv.setAdapter(adapter);
                 } else {
                     Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaskListResponse> call, Throwable t) {
+                Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void resetRecyclerView(final long gid) {
+        Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
+
+        call.enqueue(new Callback<TaskListResponse>() {
+            @Override
+            public void onResponse(Call<TaskListResponse> call, Response<TaskListResponse> response) {
+                if(response.code() == ResponseCodes.HTTP_OK){
+                    Task[] tasks = response.body().getTasks();
+                    adapter.setTasks(tasks);
+                    adapter.notifyDataSetChanged();
+                }
+                else{
+                    Toast.makeText(TasksActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -74,6 +171,10 @@ public class TasksActivity extends AppCompatActivity {
 
         Task[] tasks;
         public TasksAdapter(Task[] tasks){
+            this.tasks = tasks;
+        }
+
+        public void setTasks(Task[] tasks){
             this.tasks = tasks;
         }
 

@@ -6,9 +6,12 @@
     <string name="invalid_credentials">Login Credentials Incorrect. Try Again!</string>
     <string name="fields_blank">You Have Left One Or More Field Blank! Please Fill Them In And Try Again!</string>
     <string name="email_not_unique">Email already used!</string>
+    <string name="user_not_found">User not found!</string>
     <string name="add_group_title">Add Group</string>
     <string name="add_group_message">Enter Name Of Group You Would Like To Create:</string>
     <string name="create_group_button">Create Group</string>
     <string name="cancel_group_button">Cancel</string>
     <string name="create_group_no_text_message">Please Enter A Group Name In The Text Field Above</string>
+    <string name="add_user">Add User</string>
+    <string name="add_user_to_group_message">Please Enter the user's email.</string>
 </resources>
