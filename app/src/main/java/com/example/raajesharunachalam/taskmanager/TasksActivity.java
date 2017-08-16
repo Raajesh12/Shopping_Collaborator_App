@@ -3,14 +3,11 @@ package com.example.raajesharunachalam.taskmanager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.text.IDNA;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,19 +19,11 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
-import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
-import com.example.raajesharunachalam.taskmanager.responses.ErrorResponse;
-import com.example.raajesharunachalam.taskmanager.responses.Group;
-import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Task;
 import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
 
-import java.io.IOException;
-
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

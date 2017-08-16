@@ -19,7 +19,7 @@ import retrofit2.http.Query;
 public interface GroupUserEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/group_user")
-    Call<ErrorResponse> addUserToGroup(@Body AddUserGroupRequest request);
+    Call<Void> addUserToGroup(@Body AddUserGroupRequest request);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/group_user")
