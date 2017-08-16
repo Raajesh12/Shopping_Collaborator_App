@@ -16,7 +16,6 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        tools:text="Vishnu Jaganathan"
-        android:textColor="@color/black"/>
+        tools:text="Vishnu Jaganathan"/>
 
 </android.support.constraint.ConstraintLayout>
