@@ -72,8 +72,8 @@ public class TasksActivity extends AppCompatActivity {
         switch(item.getItemId()){
             case R.id.add_user:
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setTitle("Add User");
-                dialog.setMessage("Type user's email:");
+                dialog.setTitle(R.string.add_user);
+                dialog.setMessage(R.string.add_user_to_group_message);
                 final EditText input = new EditText(TasksActivity.this);
                 FrameLayout container = new FrameLayout(TasksActivity.this);
                 FrameLayout.LayoutParams params =
@@ -95,7 +95,7 @@ public class TasksActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<ErrorResponse> call, Response<ErrorResponse> response) {
                                 if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
-                                    Toast.makeText(TasksActivity.this, "Email not found!",Toast.LENGTH_LONG).show();
+                                    Toast.makeText(TasksActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
                                 }
                                 resetRecyclerView(gid);
                             }
