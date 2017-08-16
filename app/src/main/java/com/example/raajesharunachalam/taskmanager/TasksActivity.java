@@ -88,27 +88,37 @@ public class TasksActivity extends AppCompatActivity {
                 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String userEmail = input.getText().toString();
+                        final String userEmail = input.getText().toString();
                         AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
-                        Call<ErrorResponse> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
-                        call.enqueue(new Callback<ErrorResponse>() {
+                        Call<Void> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
+                        call.enqueue(new Callback<Void>() {
                             @Override
-                            public void onResponse(Call<ErrorResponse> call, Response<ErrorResponse> response) {
+                            public void onResponse(Call<Void> call, Response<Void> response) {
                                 if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
                                     Toast.makeText(TasksActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
                                 }
-                                resetRecyclerView(gid);
+                                else if(response.code()==ResponseCodes.HTTP_CREATED){
+                                    Toast.makeText(TasksActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                }
                             }
 
                             @Override
-                            public void onFailure(Call<ErrorResponse> call, Throwable t) {
+                            public void onFailure(Call<Void> call, Throwable t) {
                                 Toast.makeText(TasksActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
 
                             }
                         });
+                        dialog.dismiss();
+                    }
+                });
+                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                     }
                 });
 
+                dialog.show();
                 return true;
             case R.id.view_users:
                 //method
