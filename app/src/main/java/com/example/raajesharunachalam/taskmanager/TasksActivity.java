@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Task;
@@ -83,11 +85,14 @@ public class TasksActivity extends AppCompatActivity {
                         call.enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
-                                if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
+                                if(response.code()==ResponseCodes.HTTP_CREATED){
+                                    Toast.makeText(TasksActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                }
+                                else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
                                     Toast.makeText(TasksActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
                                 }
-                                else if(response.code()==ResponseCodes.HTTP_CREATED){
-                                    Toast.makeText(TasksActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                else{
+                                    Toast.makeText(TasksActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
                                 }
                             }
 
@@ -110,7 +115,8 @@ public class TasksActivity extends AppCompatActivity {
                 dialog.show();
                 return true;
             case R.id.view_users:
-                //method
+                Intent intent = new Intent(TasksActivity.this, UsersInGroupActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
