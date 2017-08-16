@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_users_in_group);
         gid = getIntent().getLongExtra(IntentKeys.GID,0L);
         rv = (RecyclerView) findViewById(R.id.recycle_group_users);
+        initializeRecycler(gid);
     }
 
     public void initializeRecycler(final long gid){
@@ -47,8 +49,6 @@ public class UsersInGroupActivity extends AppCompatActivity {
                     User[] users = response.body().getUsers();
                     UsersAdapter adapter = new UsersAdapter(users);
                     rv.setAdapter(adapter);
-
-
                 }
                 else{
                     Toast.makeText(UsersInGroupActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
@@ -57,7 +57,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<UsersInGroupResponse> call, Throwable t) {
-
+                Toast.makeText(UsersInGroupActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
 
