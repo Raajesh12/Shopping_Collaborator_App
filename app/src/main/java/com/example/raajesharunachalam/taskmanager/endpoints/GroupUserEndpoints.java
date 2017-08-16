@@ -23,7 +23,7 @@ public interface GroupUserEndpoints {
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/group_user")
-    Call<Void> deleteUserFromGroup(@Query("gid") int gid, @Query("uid") int uid);
+    Call<Void> deleteUserFromGroup(@Query("gid") long gid, @Query("uid") long uid);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://taskmanager.host")

@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
+import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.CreateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
@@ -64,8 +65,7 @@ public class GroupsActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 Long gid = (Long) viewHolder.itemView.getTag();
-                Call<Void> call = GroupEndpoints.groupEndpoints.deleteGroup(gid.longValue());
-
+                Call<Void> call = GroupUserEndpoints.groupUserEndpoints.deleteUserFromGroup(gid.longValue(), uid);
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
@@ -81,7 +81,6 @@ public class GroupsActivity extends AppCompatActivity {
                         Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                     }
                 });
-
             }
         }).attachToRecyclerView(rv);
 
