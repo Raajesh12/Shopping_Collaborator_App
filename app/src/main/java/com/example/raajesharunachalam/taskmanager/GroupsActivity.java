@@ -64,7 +64,10 @@ public class GroupsActivity extends AppCompatActivity {
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
                             refreshRecyclerView(uid);
-                        } else {
+                        }
+                        else if (response.code() == ResponseCodes.HTTP_BAD_REQUEST){
+                            Toast.makeText(GroupsActivity.this, R.string.owner_cant_leave, Toast.LENGTH_LONG).show();
+                        } else{
                             Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                         }
                     }
