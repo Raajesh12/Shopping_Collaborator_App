@@ -33,17 +33,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TasksActivity extends AppCompatActivity {
+public class ItemsActivity extends AppCompatActivity {
 
     public static long gid;
     public static long uid;
     RecyclerView rv;
-    TasksAdapter adapter;
+    ItemsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tasks);
+        setContentView(R.layout.activity_items);
         Intent intent = getIntent();
         gid = intent.getLongExtra(IntentKeys.GID, 0L);
         uid = intent.getLongExtra(IntentKeys.UID, 0L);
@@ -55,46 +55,46 @@ public class TasksActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(TasksActivity.this);
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
                 alertDialog.setTitle(R.string.add_items_title);
                 alertDialog.setMessage(R.string.add_items_message);
 
-                LinearLayout container = new LinearLayout(TasksActivity.this);
+                LinearLayout container = new LinearLayout(ItemsActivity.this);
                 container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 container.setOrientation(LinearLayout.VERTICAL);
 
-                final EditText taskInput = new EditText(TasksActivity.this);
-                taskInput.setHint(R.string.task_input_hint);
-                LinearLayout.LayoutParams taskParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                taskParams.topMargin = 0;
-                taskParams.leftMargin = 100;
-                taskParams.rightMargin = 100;
-                taskParams.bottomMargin = 0;
-                taskInput.setLayoutParams(taskParams);
+                final EditText itemInput = new EditText(ItemsActivity.this);
+                itemInput.setHint(R.string.task_input_hint);
+                LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                itemParams.topMargin = 0;
+                itemParams.leftMargin = 100;
+                itemParams.rightMargin = 100;
+                itemParams.bottomMargin = 0;
+                itemInput.setLayoutParams(itemParams);
 
-                final EditText estimateInput = new EditText(TasksActivity.this);
+                final EditText estimateInput = new EditText(ItemsActivity.this);
                 estimateInput.setHint(R.string.estimate_input_hint);
                 LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                taskParams.topMargin = 50;
-                taskParams.leftMargin = 100;
-                taskParams.rightMargin = 100;
-                taskParams.bottomMargin = 50;
+                estimateParams.topMargin = 50;
+                estimateParams.leftMargin = 100;
+                estimateParams.rightMargin = 100;
+                estimateParams.bottomMargin = 50;
                 estimateInput.setLayoutParams(estimateParams);
 
-                container.addView(taskInput);
+                container.addView(itemInput);
                 container.addView(estimateInput);
                 alertDialog.setView(container);
 
                 alertDialog.setPositiveButton(R.string.add_item_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String task = taskInput.getText().toString();
+                        String item = itemInput.getText().toString();
                         String estimateString = estimateInput.getText().toString();
-                        if(task.length() == 0 || estimateString.length() == 0){
-                            Toast.makeText(TasksActivity.this, R.string.create_task_no_text, Toast.LENGTH_LONG).show();
+                        if(item.length() == 0 || estimateString.length() == 0){
+                            Toast.makeText(ItemsActivity.this, R.string.create_task_no_text, Toast.LENGTH_LONG).show();
                         } else {
                             double estimate = Double.parseDouble(estimateString);
-                            CreateItemRequest request = new CreateItemRequest(uid, gid, task, estimate);
+                            CreateItemRequest request = new CreateItemRequest(uid, gid, item, estimate);
                             Call<ItemIDResponse> call = ItemEndpoints.ITEM_ENDPOINTS.createItem(request);
 
                             call.enqueue(new Callback<ItemIDResponse>() {
@@ -103,13 +103,13 @@ public class TasksActivity extends AppCompatActivity {
                                     if(response.code() == ResponseCodes.HTTP_CREATED) {
                                         refreshRecyclerView(gid);
                                     } else {
-                                        Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                     }
                                 }
 
                                 @Override
                                 public void onFailure(Call<ItemIDResponse> call, Throwable t) {
-                                    Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
@@ -143,8 +143,8 @@ public class TasksActivity extends AppCompatActivity {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                 dialog.setTitle(R.string.add_user);
                 dialog.setMessage(R.string.add_user_to_group_message);
-                final EditText input = new EditText(TasksActivity.this);
-                FrameLayout container = new FrameLayout(TasksActivity.this);
+                final EditText input = new EditText(ItemsActivity.this);
+                FrameLayout container = new FrameLayout(ItemsActivity.this);
                 FrameLayout.LayoutParams params =
                         new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.topMargin = 50;
@@ -164,19 +164,19 @@ public class TasksActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==ResponseCodes.HTTP_CREATED){
-                                    Toast.makeText(TasksActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ItemsActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
                                 }
                                 else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
-                                    Toast.makeText(TasksActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ItemsActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
                                 }
                                 else{
-                                    Toast.makeText(TasksActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<Void> call, Throwable t) {
-                                Toast.makeText(TasksActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
 
                             }
                         });
@@ -193,7 +193,7 @@ public class TasksActivity extends AppCompatActivity {
                 dialog.show();
                 return true;
             case R.id.view_users:
-                Intent intent = new Intent(TasksActivity.this, UsersInGroupActivity.class);
+                Intent intent = new Intent(ItemsActivity.this, UsersInGroupActivity.class);
                 intent.putExtra(IntentKeys.GID, gid);
                 startActivity(intent);
                 return true;
@@ -210,20 +210,20 @@ public class TasksActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if (response.code() == ResponseCodes.HTTP_OK) {
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(TasksActivity.this);
+                    LinearLayoutManager layoutManager = new LinearLayoutManager(ItemsActivity.this);
                     rv.setLayoutManager(layoutManager);
 
                     Item[] items = response.body().getItems();
-                    adapter = new TasksActivity.TasksAdapter(items);
+                    adapter = new ItemsAdapter(items);
                     rv.setAdapter(adapter);
                 } else {
-                    Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ItemListResponse> call, Throwable t) {
-                Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -240,21 +240,21 @@ public class TasksActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 }
                 else{
-                    Toast.makeText(TasksActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
+                    Toast.makeText(ItemsActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ItemListResponse> call, Throwable t) {
-                Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder>{
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHolder>{
 
         Item[] items;
-        public TasksAdapter(Item[] items){
+        public ItemsAdapter(Item[] items){
             this.items = items;
         }
 
@@ -263,23 +263,23 @@ public class TasksActivity extends AppCompatActivity {
         }
 
         @Override
-        public TasksViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = TasksActivity.this;
+        public ItemsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Context context = ItemsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
-            View view = myInflater.inflate(R.layout.task_item, parent, false);
+            View view = myInflater.inflate(R.layout.item, parent, false);
 
-            TasksViewHolder viewHolder = new TasksViewHolder(view);
+            ItemsViewHolder viewHolder = new ItemsViewHolder(view);
             return viewHolder;
         }
 
         @Override
-        public void onBindViewHolder(TasksViewHolder holder, int position) {
+        public void onBindViewHolder(ItemsViewHolder holder, int position) {
             Item item = items[position];
-            if(item.getTaskDescription() != null) {
-                holder.taskDescription.setText(item.getTaskDescription());
+            if(item.getItemName() != null) {
+                holder.itemName.setText(item.getItemName());
                 String name = item.getFirstName() + " " + item.getLastName();
-                holder.taskAuthor.setText(name);
+                holder.itemAuthor.setText(name);
             }
         }
 
@@ -288,13 +288,13 @@ public class TasksActivity extends AppCompatActivity {
             return items.length;
         }
 
-        public class TasksViewHolder extends RecyclerView.ViewHolder{
-            public TextView taskDescription;
-            public TextView taskAuthor;
-            public TasksViewHolder(View itemView) {
+        public class ItemsViewHolder extends RecyclerView.ViewHolder{
+            public TextView itemName;
+            public TextView itemAuthor;
+            public ItemsViewHolder(View itemView) {
                 super(itemView);
-                taskDescription = (TextView) itemView.findViewById(R.id.task_description);
-                taskAuthor = (TextView) itemView.findViewById(R.id.task_author);
+                itemName = (TextView) itemView.findViewById(R.id.task_description);
+                itemAuthor = (TextView) itemView.findViewById(R.id.task_author);
             }
         }
     }
