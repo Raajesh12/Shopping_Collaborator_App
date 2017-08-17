@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,10 +20,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
-import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
+import com.example.raajesharunachalam.taskmanager.endpoints.ItemEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Task;
-import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
+import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -126,11 +125,11 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     public void initializeRecyclerView(final long gid) {
-        Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
+        Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
-        call.enqueue(new Callback<TaskListResponse>() {
+        call.enqueue(new Callback<ItemListResponse>() {
             @Override
-            public void onResponse(Call<TaskListResponse> call, Response<TaskListResponse> response) {
+            public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if (response.code() == ResponseCodes.HTTP_OK) {
                     LinearLayoutManager layoutManager = new LinearLayoutManager(TasksActivity.this);
                     rv.setLayoutManager(layoutManager);
@@ -144,18 +143,18 @@ public class TasksActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TaskListResponse> call, Throwable t) {
+            public void onFailure(Call<ItemListResponse> call, Throwable t) {
                 Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
 
     public void resetRecyclerView(final long gid) {
-        Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
+        Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
-        call.enqueue(new Callback<TaskListResponse>() {
+        call.enqueue(new Callback<ItemListResponse>() {
             @Override
-            public void onResponse(Call<TaskListResponse> call, Response<TaskListResponse> response) {
+            public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if(response.code() == ResponseCodes.HTTP_OK){
                     Task[] tasks = response.body().getTasks();
                     adapter.setTasks(tasks);
@@ -167,7 +166,7 @@ public class TasksActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TaskListResponse> call, Throwable t) {
+            public void onFailure(Call<ItemListResponse> call, Throwable t) {
                 Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
