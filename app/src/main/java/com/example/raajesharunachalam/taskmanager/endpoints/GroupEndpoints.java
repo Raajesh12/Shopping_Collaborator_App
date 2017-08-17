@@ -37,7 +37,7 @@ public interface GroupEndpoints {
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/groups/{gid}")
-    Call<Void> deleteGroup(@Path("gid") long gid);
+    Call<Void> deleteGroup(@Query("uid") long uid, @Path("gid") long gid);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://taskmanager.host")

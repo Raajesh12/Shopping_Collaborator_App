@@ -15,7 +15,16 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginRight="80dp"
         tools:text="Vishnu Jaganathan"/>
+
+    <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="20dp"
+        android:background="@drawable/ic_cancel_black_24dp"
+        app:layout_constraintLeft_toRightOf="@id/tv_name"
+        app:layout_constraintTop_toTopOf="@id/tv_name"/>
 
 </android.support.constraint.ConstraintLayout>

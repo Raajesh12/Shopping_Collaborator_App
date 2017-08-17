@@ -14,4 +14,6 @@
     <string name="create_group_no_text_message">Please Enter A Group Name In The Text Field Above</string>
     <string name="add_user">Add User</string>
     <string name="add_user_to_group_message">Please Enter the user\'s email.</string>
+    <string name="removed_user_message">Removed User Successfully</string>
+    <string name="remove_self_from_group">You cannot remove yourself from this group because you are the group owner. If you would like to delete the group, choose Delete from the options menu in the group.</string>
 </resources>
