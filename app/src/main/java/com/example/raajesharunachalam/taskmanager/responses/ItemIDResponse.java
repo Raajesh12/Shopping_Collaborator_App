@@ -8,9 +8,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class ItemIDResponse {
     @SerializedName("id")
-    private int taskId;
+    private int itemId;
 
-    public int getTaskId(){
-        return taskId;
+    public int getItemId(){
+        return itemId;
     }
 }

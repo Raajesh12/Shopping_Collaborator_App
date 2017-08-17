@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName;
  * Created by raajesharunachalam on 8/11/17.
  */
 
-public class Task {
-    @SerializedName("task_id")
-    private long taskId;
+public class Item {
+    @SerializedName("item_id")
+    private long itemId;
 
     @SerializedName("first_name")
     private String firstName;
@@ -16,10 +16,10 @@ public class Task {
     @SerializedName("last_name")
     private String lastName;
 
-    @SerializedName("task_description")
-    private String taskDescription;
+    @SerializedName("item_name")
+    private String itemName;
 
-    public long getTaskId() {return taskId;}
+    public long getItemId() {return itemId;}
 
     public String getFirstName() {
         return firstName;
@@ -29,7 +29,7 @@ public class Task {
         return lastName;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+    public String getItemName() {
+        return itemName;
     }
 }

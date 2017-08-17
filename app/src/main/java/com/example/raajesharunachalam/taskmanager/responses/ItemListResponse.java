@@ -7,10 +7,10 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class ItemListResponse {
-    @SerializedName("tasks")
-    private Task[] tasks;
+    @SerializedName("items")
+    private Item[] items;
 
-    public Task[] getTasks(){
-        return tasks;
+    public Item[] getItems(){
+        return items;
     }
 }

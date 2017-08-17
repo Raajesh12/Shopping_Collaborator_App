@@ -22,12 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
-import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
+import com.example.raajesharunachalam.taskmanager.endpoints.ItemEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.CreateItemRequest;
-import com.example.raajesharunachalam.taskmanager.responses.Task;
-import com.example.raajesharunachalam.taskmanager.responses.TaskIDResponse;
-import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
+import com.example.raajesharunachalam.taskmanager.responses.Item;
+import com.example.raajesharunachalam.taskmanager.responses.ItemIDResponse;
+import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -95,11 +95,11 @@ public class TasksActivity extends AppCompatActivity {
                         } else {
                             double estimate = Double.parseDouble(estimateString);
                             CreateItemRequest request = new CreateItemRequest(uid, gid, task, estimate);
-                            Call<TaskIDResponse> call = TaskEndpoints.taskEndpoints.createTask(request);
+                            Call<ItemIDResponse> call = ItemEndpoints.ITEM_ENDPOINTS.createItem(request);
 
-                            call.enqueue(new Callback<TaskIDResponse>() {
+                            call.enqueue(new Callback<ItemIDResponse>() {
                                 @Override
-                                public void onResponse(Call<TaskIDResponse> call, Response<TaskIDResponse> response) {
+                                public void onResponse(Call<ItemIDResponse> call, Response<ItemIDResponse> response) {
                                     if(response.code() == ResponseCodes.HTTP_CREATED) {
                                         refreshRecyclerView(gid);
                                     } else {
@@ -108,7 +108,7 @@ public class TasksActivity extends AppCompatActivity {
                                 }
 
                                 @Override
-                                public void onFailure(Call<TaskIDResponse> call, Throwable t) {
+                                public void onFailure(Call<ItemIDResponse> call, Throwable t) {
                                     Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
                                 }
                             });
@@ -204,17 +204,17 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     public void initializeRecyclerView(final long gid) {
-        Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
+        Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
-        call.enqueue(new Callback<TaskListResponse>() {
+        call.enqueue(new Callback<ItemListResponse>() {
             @Override
-            public void onResponse(Call<TaskListResponse> call, Response<TaskListResponse> response) {
+            public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if (response.code() == ResponseCodes.HTTP_OK) {
                     LinearLayoutManager layoutManager = new LinearLayoutManager(TasksActivity.this);
                     rv.setLayoutManager(layoutManager);
 
-                    Task[] tasks = response.body().getTasks();
-                    adapter = new TasksActivity.TasksAdapter(tasks);
+                    Item[] items = response.body().getItems();
+                    adapter = new TasksActivity.TasksAdapter(items);
                     rv.setAdapter(adapter);
                 } else {
                     Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
@@ -222,21 +222,21 @@ public class TasksActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TaskListResponse> call, Throwable t) {
+            public void onFailure(Call<ItemListResponse> call, Throwable t) {
                 Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
     }
 
     public void refreshRecyclerView(final long gid) {
-        Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
+        Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
-        call.enqueue(new Callback<TaskListResponse>() {
+        call.enqueue(new Callback<ItemListResponse>() {
             @Override
-            public void onResponse(Call<TaskListResponse> call, Response<TaskListResponse> response) {
+            public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if(response.code() == ResponseCodes.HTTP_OK){
-                    Task[] tasks = response.body().getTasks();
-                    adapter.setTasks(tasks);
+                    Item[] items = response.body().getItems();
+                    adapter.setItems(items);
                     adapter.notifyDataSetChanged();
                 }
                 else{
@@ -245,7 +245,7 @@ public class TasksActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<TaskListResponse> call, Throwable t) {
+            public void onFailure(Call<ItemListResponse> call, Throwable t) {
                 Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
@@ -253,13 +253,13 @@ public class TasksActivity extends AppCompatActivity {
 
     public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TasksViewHolder>{
 
-        Task[] tasks;
-        public TasksAdapter(Task[] tasks){
-            this.tasks = tasks;
+        Item[] items;
+        public TasksAdapter(Item[] items){
+            this.items = items;
         }
 
-        public void setTasks(Task[] tasks){
-            this.tasks = tasks;
+        public void setItems(Item[] items){
+            this.items = items;
         }
 
         @Override
@@ -275,17 +275,17 @@ public class TasksActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(TasksViewHolder holder, int position) {
-            Task task = tasks[position];
-            if(task.getTaskDescription() != null) {
-                holder.taskDescription.setText(task.getTaskDescription());
-                String name = task.getFirstName() + " " + task.getLastName();
+            Item item = items[position];
+            if(item.getTaskDescription() != null) {
+                holder.taskDescription.setText(item.getTaskDescription());
+                String name = item.getFirstName() + " " + item.getLastName();
                 holder.taskAuthor.setText(name);
             }
         }
 
         @Override
         public int getItemCount() {
-            return tasks.length;
+            return items.length;
         }
 
         public class TasksViewHolder extends RecyclerView.ViewHolder{

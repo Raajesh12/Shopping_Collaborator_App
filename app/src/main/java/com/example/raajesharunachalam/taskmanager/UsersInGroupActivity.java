@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
-import com.example.raajesharunachalam.taskmanager.responses.Task;
 import com.example.raajesharunachalam.taskmanager.responses.User;
 import com.example.raajesharunachalam.taskmanager.responses.UsersInGroupResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static android.R.attr.y;
 
 public class UsersInGroupActivity extends AppCompatActivity {
 
