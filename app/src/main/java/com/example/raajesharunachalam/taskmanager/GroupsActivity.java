@@ -130,7 +130,7 @@ public class GroupsActivity extends AppCompatActivity {
                     }
                 });
 
-                alertDialog.setNegativeButton(R.string.cancel_group_button, new DialogInterface.OnClickListener() {
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -228,6 +228,7 @@ public class GroupsActivity extends AppCompatActivity {
 
                     long groupId = longer.longValue();
                     intent.putExtra(IntentKeys.GID, groupId);
+                    intent.putExtra(IntentKeys.UID, uid);
 
                     startActivity(intent);
                 }

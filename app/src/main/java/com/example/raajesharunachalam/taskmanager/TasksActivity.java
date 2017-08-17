@@ -3,12 +3,12 @@ package com.example.raajesharunachalam.taskmanager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,13 +17,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.TaskEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
+import com.example.raajesharunachalam.taskmanager.requests.CreateItemRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Task;
+import com.example.raajesharunachalam.taskmanager.responses.TaskIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
 
 import retrofit2.Call;
@@ -33,6 +36,7 @@ import retrofit2.Response;
 public class TasksActivity extends AppCompatActivity {
 
     public static long gid;
+    public static long uid;
     RecyclerView rv;
     TasksAdapter adapter;
 
@@ -42,13 +46,87 @@ public class TasksActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tasks);
         Intent intent = getIntent();
         gid = intent.getLongExtra(IntentKeys.GID, 0L);
+        uid = intent.getLongExtra(IntentKeys.UID, 0L);
 
         rv = (RecyclerView) findViewById(R.id.recycle_tasks);
-
         initializeRecyclerView(gid);
 
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_tasks_button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(TasksActivity.this);
+                alertDialog.setTitle(R.string.add_items_title);
+                alertDialog.setMessage(R.string.add_items_message);
 
+                LinearLayout container = new LinearLayout(TasksActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
 
+                final EditText taskInput = new EditText(TasksActivity.this);
+                taskInput.setHint(R.string.task_input_hint);
+                LinearLayout.LayoutParams taskParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                taskParams.topMargin = 0;
+                taskParams.leftMargin = 100;
+                taskParams.rightMargin = 100;
+                taskParams.bottomMargin = 0;
+                taskInput.setLayoutParams(taskParams);
+
+                final EditText estimateInput = new EditText(TasksActivity.this);
+                estimateInput.setHint(R.string.estimate_input_hint);
+                LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                taskParams.topMargin = 50;
+                taskParams.leftMargin = 100;
+                taskParams.rightMargin = 100;
+                taskParams.bottomMargin = 50;
+                estimateInput.setLayoutParams(estimateParams);
+
+                container.addView(taskInput);
+                container.addView(estimateInput);
+                alertDialog.setView(container);
+
+                alertDialog.setPositiveButton(R.string.add_item_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String task = taskInput.getText().toString();
+                        String estimateString = estimateInput.getText().toString();
+                        if(task.length() == 0 || estimateString.length() == 0){
+                            Toast.makeText(TasksActivity.this, R.string.create_task_no_text, Toast.LENGTH_LONG).show();
+                        } else {
+                            double estimate = Double.parseDouble(estimateString);
+                            CreateItemRequest request = new CreateItemRequest(uid, gid, task, estimate);
+                            Call<TaskIDResponse> call = TaskEndpoints.taskEndpoints.createTask(request);
+
+                            call.enqueue(new Callback<TaskIDResponse>() {
+                                @Override
+                                public void onResponse(Call<TaskIDResponse> call, Response<TaskIDResponse> response) {
+                                    if(response.code() == ResponseCodes.HTTP_CREATED) {
+                                        refreshRecyclerView(gid);
+                                    } else {
+                                        Toast.makeText(TasksActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<TaskIDResponse> call, Throwable t) {
+                                    Toast.makeText(TasksActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.show();
+            }
+        });
     }
 
     @Override
@@ -150,7 +228,7 @@ public class TasksActivity extends AppCompatActivity {
         });
     }
 
-    public void resetRecyclerView(final long gid) {
+    public void refreshRecyclerView(final long gid) {
         Call<TaskListResponse> call = TaskEndpoints.taskEndpoints.getTasks(gid);
 
         call.enqueue(new Callback<TaskListResponse>() {

@@ -10,10 +10,16 @@
     <string name="add_group_title">Add Group</string>
     <string name="add_group_message">Enter Name Of Group You Would Like To Create:</string>
     <string name="create_group_button">Create Group</string>
-    <string name="cancel_group_button">Cancel</string>
+    <string name="cancel_button">Cancel</string>
     <string name="create_group_no_text_message">Please Enter A Group Name In The Text Field Above</string>
+    <string name="create_task_no_text">Please Fill In Both Of The Above Fields!</string>
     <string name="add_user">Add User</string>
     <string name="add_user_to_group_message">Please Enter the user\'s email.</string>
     <string name="removed_user_message">Removed User Successfully</string>
-    <string name="remove_self_from_group">You cannot remove yourself from this group because you are the group owner. If you would like to delete the group, choose Delete from the options menu in the group.</string>
+    <string name="remove_owner_from_group">You cannot remove the group owner from the group.</string>
+    <string name="add_items_title">Add Item</string>
+    <string name="add_items_message">Enter the name of the item and the estimated cost:</string>
+    <string name="add_item_button">Add Item</string>
+    <string name="task_input_hint">Enter name of item</string>
+    <string name="estimate_input_hint">Enter the estimated price</string>
 </resources>

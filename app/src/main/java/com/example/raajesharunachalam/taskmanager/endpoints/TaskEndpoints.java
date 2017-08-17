@@ -1,8 +1,7 @@
 package com.example.raajesharunachalam.taskmanager.endpoints;
 
-import com.example.raajesharunachalam.taskmanager.requests.CreateTaskRequest;
-import com.example.raajesharunachalam.taskmanager.requests.UpdateTaskRequest;
-import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
+import com.example.raajesharunachalam.taskmanager.requests.CreateItemRequest;
+import com.example.raajesharunachalam.taskmanager.requests.UpdateItemRequest;
 import com.example.raajesharunachalam.taskmanager.responses.TaskIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TaskListResponse;
 
@@ -29,11 +28,11 @@ public interface TaskEndpoints {
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/tasks")
-    Call<TaskIDResponse> createTask(@Body CreateTaskRequest createTaskRequest);
+    Call<TaskIDResponse> createTask(@Body CreateItemRequest createItemRequest);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @PUT("/tasks/{taskId}")
-    Call<Void> updateTask(@Path("taskId") int taskId, @Body UpdateTaskRequest updateTaskRequest);
+    Call<Void> updateTask(@Path("taskId") int taskId, @Body UpdateItemRequest updateItemRequest);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/tasks/{taskId}")

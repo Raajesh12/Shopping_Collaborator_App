@@ -137,7 +137,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
                                 Toast.makeText(UsersInGroupActivity.this, message.toString(), Toast.LENGTH_LONG).show();
                                 resetRecyclerView(gid);
                             } else if (response.code() == ResponseCodes.HTTP_BAD_REQUEST){
-                                Toast.makeText(UsersInGroupActivity.this, R.string.remove_self_from_group, Toast.LENGTH_LONG).show();
+                                Toast.makeText(UsersInGroupActivity.this, R.string.remove_owner_from_group, Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(UsersInGroupActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                             }
