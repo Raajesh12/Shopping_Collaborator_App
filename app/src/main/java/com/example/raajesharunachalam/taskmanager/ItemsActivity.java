@@ -3,6 +3,8 @@ package com.example.raajesharunachalam.taskmanager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -37,24 +39,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ItemsActivity extends AppCompatActivity {
+public class ItemsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
+    private static final String REFRESH_KEY = "Refresh";
 
-    public static long gid;
-    public static long uid;
+    private static long gid;
+    private static long uid;
     RecyclerView rv;
     ItemsAdapter adapter;
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d("Lifecycle", "onPause() called");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("Lifecycle", "onResume() called");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +57,12 @@ public class ItemsActivity extends AppCompatActivity {
 
         rv = (RecyclerView) findViewById(R.id.recycle_items);
         initializeRecyclerView(gid);
+
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+        Log.d("SharedPreferences", String.valueOf(sharedPreferences.getBoolean(REFRESH_KEY, false)));
+        sharedPreferences.edit().putBoolean(REFRESH_KEY, false).apply();
+
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
         FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_items_button);
         button.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +108,8 @@ public class ItemsActivity extends AppCompatActivity {
                             Toast.makeText(ItemsActivity.this, R.string.create_item_no_text, Toast.LENGTH_LONG).show();
                         } else {
                             double estimate = Double.parseDouble(estimateString);
+                            estimate = (int) (estimate * 100);
+                            estimate =  estimate/100.0;
                             CreateItemRequest request = new CreateItemRequest(uid, gid, item, estimate);
                             Call<ItemIDResponse> call = ItemEndpoints.ITEM_ENDPOINTS.createItem(request);
 
@@ -118,7 +117,7 @@ public class ItemsActivity extends AppCompatActivity {
                                 @Override
                                 public void onResponse(Call<ItemIDResponse> call, Response<ItemIDResponse> response) {
                                     if(response.code() == ResponseCodes.HTTP_CREATED) {
-                                        refreshRecyclerView(gid);
+                                        refreshRecyclerView(gid, true);
                                     } else {
                                         Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                     }
@@ -257,6 +256,7 @@ public class ItemsActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 final Long gid = (Long) viewHolder.itemView.getTag();
                 ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                final int position = holder.getAdapterPosition();
                 final String itemName = holder.itemName.getText().toString();
                 final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
                 final boolean done = true;
@@ -301,13 +301,15 @@ public class ItemsActivity extends AppCompatActivity {
                                 } else{
                                     Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
-                                refreshRecyclerView(gid);
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
                             }
 
                             @Override
                             public void onFailure(Call<Void> call, Throwable t) {
                                 Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
-                                refreshRecyclerView(gid);
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
                             }
                         });
                         dialog.dismiss();
@@ -317,6 +319,7 @@ public class ItemsActivity extends AppCompatActivity {
                 alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        refreshRecyclerView(gid, false);
                         dialog.dismiss();
                     }
                 });
@@ -325,28 +328,39 @@ public class ItemsActivity extends AppCompatActivity {
         }).attachToRecyclerView(rv);
     }
 
-    public void refreshRecyclerView(final long gid) {
-        Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
+    public void refreshRecyclerView(final long gid, boolean makeAPICall) {
+        if(makeAPICall) {
+            Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
-        call.enqueue(new Callback<ItemListResponse>() {
-            @Override
-            public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
-                if(response.code() == ResponseCodes.HTTP_OK){
-                    Item[] items = response.body().getItems();
-                    Log.d("ItemsView", String.valueOf(items.length));
-                    adapter.setItems(items);
-                    adapter.notifyDataSetChanged();
+            call.enqueue(new Callback<ItemListResponse>() {
+                @Override
+                public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
+                    if (response.code() == ResponseCodes.HTTP_OK) {
+                        Item[] items = response.body().getItems();
+                        adapter.setItems(items);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                    }
                 }
-                else{
-                    Toast.makeText(ItemsActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<ItemListResponse> call, Throwable t) {
-                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<ItemListResponse> call, Throwable t) {
+                    Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(REFRESH_KEY) && sharedPreferences.getBoolean(REFRESH_KEY, false) == true) {
+            Log.d("SharedPreferences", "Refreshed");
+            sharedPreferences.edit().putBoolean(REFRESH_KEY, false).apply();
+            refreshRecyclerView(gid, true);
+        }
     }
 
     public class ItemsAdapter extends RecyclerView.Adapter<ItemsViewHolder>{
@@ -381,8 +395,16 @@ public class ItemsActivity extends AppCompatActivity {
                 holder.itemAuthor.setText(name);
 
                 double estimate = item.getEstimate();
-
-                holder.estimate.setText("$" + String.valueOf(estimate));
+                int estimateInt = (int) (100 * estimate);
+                String estimateString = String.valueOf(estimateInt);
+                String beforeDecimal = estimateString.substring(0, estimateString.length() - 2);
+                String afterDecimal = estimateString.substring(estimateString.length() - 2);
+                StringBuilder estimateBuilder = new StringBuilder();
+                estimateBuilder.append("$");
+                estimateBuilder.append(beforeDecimal);
+                estimateBuilder.append(".");
+                estimateBuilder.append(afterDecimal);
+                holder.estimate.setText(estimateBuilder.toString());
 
                 Long itemId = new Long(item.getItemId());
                 holder.itemView.setTag(itemId);
