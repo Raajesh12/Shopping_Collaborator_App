@@ -39,6 +39,10 @@ public interface ItemEndpoints {
     @DELETE("/items/{itemId}")
     Call<Void> deleteItem(@Path("itemId") long itemId);
 
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @DELETE("/items/delete_all")
+    Call<Void> deleteAllItems(@Query("gid") long gid, @Query("uid") long uid);
+
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
