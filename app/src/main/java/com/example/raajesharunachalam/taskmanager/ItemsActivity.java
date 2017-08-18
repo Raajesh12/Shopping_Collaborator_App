@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,10 +49,10 @@ public class ItemsActivity extends AppCompatActivity {
         gid = intent.getLongExtra(IntentKeys.GID, 0L);
         uid = intent.getLongExtra(IntentKeys.UID, 0L);
 
-        rv = (RecyclerView) findViewById(R.id.recycle_tasks);
+        rv = (RecyclerView) findViewById(R.id.recycle_items);
         initializeRecyclerView(gid);
 
-        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_tasks_button);
+        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_items_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,7 +65,7 @@ public class ItemsActivity extends AppCompatActivity {
                 container.setOrientation(LinearLayout.VERTICAL);
 
                 final EditText itemInput = new EditText(ItemsActivity.this);
-                itemInput.setHint(R.string.task_input_hint);
+                itemInput.setHint(R.string.item_input_hint);
                 LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 itemParams.topMargin = 0;
                 itemParams.leftMargin = 100;
@@ -73,6 +74,7 @@ public class ItemsActivity extends AppCompatActivity {
                 itemInput.setLayoutParams(itemParams);
 
                 final EditText estimateInput = new EditText(ItemsActivity.this);
+                estimateInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
                 estimateInput.setHint(R.string.estimate_input_hint);
                 LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 estimateParams.topMargin = 50;
@@ -91,7 +93,7 @@ public class ItemsActivity extends AppCompatActivity {
                         String item = itemInput.getText().toString();
                         String estimateString = estimateInput.getText().toString();
                         if(item.length() == 0 || estimateString.length() == 0){
-                            Toast.makeText(ItemsActivity.this, R.string.create_task_no_text, Toast.LENGTH_LONG).show();
+                            Toast.makeText(ItemsActivity.this, R.string.create_item_no_text, Toast.LENGTH_LONG).show();
                         } else {
                             double estimate = Double.parseDouble(estimateString);
                             CreateItemRequest request = new CreateItemRequest(uid, gid, item, estimate);
@@ -132,7 +134,7 @@ public class ItemsActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inf = getMenuInflater();
-        inf.inflate(R.menu.tasks_menu, menu);
+        inf.inflate(R.menu.items_menu, menu);
         return true;
     }
 
@@ -283,7 +285,8 @@ public class ItemsActivity extends AppCompatActivity {
                 holder.itemAuthor.setText(name);
 
                 double estimate = item.getEstimate();
-                holder.estimate.setText(String.valueOf(estimate));
+
+                holder.estimate.setText("$" + String.valueOf(estimate));
 
                 Long itemId = new Long(item.getItemId());
                 holder.itemView.setTag(itemId);

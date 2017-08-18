@@ -15,7 +15,7 @@
         android:textSize="20sp"
         android:layout_marginTop="25dp"
         android:layout_marginLeft="25dp"
-        android:layout_marginRight="120dp"
+        android:layout_marginRight="100dp"
         tools:text="Buy 2 gallons of 2% milk"/>
     <TextView
         android:id="@+id/item_author"
