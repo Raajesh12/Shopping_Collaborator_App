@@ -302,8 +302,8 @@ public class ItemsActivity extends AppCompatActivity {
         public TextView estimate;
         public ItemsViewHolder(View itemView) {
             super(itemView);
-            itemName = (TextView) itemView.findViewById(R.id.task_description);
-            itemAuthor = (TextView) itemView.findViewById(R.id.task_author);
+            itemName = (TextView) itemView.findViewById(R.id.item_description);
+            itemAuthor = (TextView) itemView.findViewById(R.id.item_author);
             estimate = (TextView) itemView.findViewById(R.id.item_estimate);
         }
     }
