@@ -226,6 +226,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
                                     Toast.makeText(ItemsActivity.this, R.string.deleted_all_items,Toast.LENGTH_LONG).show();
+                                    refreshRecyclerView(gid, false);
                                 }
                                 else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
                                     Toast.makeText(ItemsActivity.this, R.string.only_owner_clear_message, Toast.LENGTH_LONG).show();
@@ -233,7 +234,6 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                                 else{
                                     Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
-                                refreshRecyclerView(gid, false);
                             }
 
                             @Override
