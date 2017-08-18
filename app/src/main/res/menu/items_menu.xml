@@ -10,4 +10,8 @@
         android:title="View Users"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/clear_items"
+        android:title="Clear All Items"
+        app:showAsAction="never"/>
+
 </menu>

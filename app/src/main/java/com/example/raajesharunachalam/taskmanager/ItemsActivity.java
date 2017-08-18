@@ -213,6 +213,43 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 intent.putExtra(IntentKeys.GID, gid);
                 startActivity(intent);
                 return true;
+            case R.id.clear_items:
+                AlertDialog.Builder dialog1 = new AlertDialog.Builder(this);
+                dialog1.setTitle(R.string.delete_all_title);
+                dialog1.setMessage(R.string.delete_all_warning);
+                dialog1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.deleteAllItems(gid, uid);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(ItemsActivity.this, R.string.deleted_all_items,Toast.LENGTH_LONG).show();
+                                    refreshRecyclerView(gid, false);
+                                }
+                                else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                    Toast.makeText(ItemsActivity.this, R.string.only_owner_clear_message, Toast.LENGTH_LONG).show();
+                                }
+                                else{
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+                dialog1.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog1.show();
             default:
                 return super.onOptionsItemSelected(item);
         }
