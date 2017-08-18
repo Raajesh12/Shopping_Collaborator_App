@@ -140,6 +140,12 @@ public class GroupsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        refreshRecyclerView(uid);
+    }
+
     public void initializeRecyclerView(final long uid) {
         Call<GroupListResponse> call = GroupEndpoints.groupEndpoints.getGroups(uid);
 

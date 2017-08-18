@@ -29,7 +29,11 @@
     <string name="actual_price">Actual Price</string>
     <string name="actual_price_message">Enter an actual price for the item to remove it from the list.</string>
     <string name="deleted_all_items">You have deleted all items from the group.</string>
-    <string name="delete_all_warning">Are you sure you want to clear all items from the group?</string>
+    <string name="delete_all_warning">Are you sure you want to clear all items from the group? This action cannot be undone.</string>
     <string name="delete_all_title">Delete All</string>
     <string name="only_owner_clear_message">Only the group owner can delete all items.</string>
+    <string name="delete_group_title">Delete Group</string>
+    <string name="delete_group_warning">Are you sure you want to delete this group? This action cannot be undone.</string>
+    <string name="group_deleted">Group Deleted Successfully</string>
+    <string name="only_owner_delete_message">Only the group owner can delete the group</string>
 </resources>

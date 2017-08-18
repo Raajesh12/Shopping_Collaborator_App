@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.ItemEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
@@ -226,7 +227,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
                                     Toast.makeText(ItemsActivity.this, R.string.deleted_all_items,Toast.LENGTH_LONG).show();
-                                    refreshRecyclerView(gid, false);
+                                    refreshRecyclerView(gid, true);
                                 }
                                 else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
                                     Toast.makeText(ItemsActivity.this, R.string.only_owner_clear_message, Toast.LENGTH_LONG).show();
@@ -243,13 +244,52 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                         });
                     }
                 });
-                dialog1.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                dialog1.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
                 });
                 dialog1.show();
+                return true;
+            case R.id.delete_group:
+                AlertDialog.Builder dialog2 = new AlertDialog.Builder(this);
+                dialog2.setTitle(R.string.delete_group_title);
+                dialog2.setMessage(R.string.delete_group_warning);
+                dialog2.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Call<Void> call = GroupEndpoints.groupEndpoints.deleteGroup(gid, uid);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(ItemsActivity.this, R.string.group_deleted,Toast.LENGTH_LONG).show();
+                                    ItemsActivity.this.finish();
+                                }
+                                else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                    Toast.makeText(ItemsActivity.this, R.string.only_owner_delete_message, Toast.LENGTH_LONG).show();
+                                }
+                                else{
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                });
+                dialog2.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog2.show();
+
             default:
                 return super.onOptionsItemSelected(item);
         }

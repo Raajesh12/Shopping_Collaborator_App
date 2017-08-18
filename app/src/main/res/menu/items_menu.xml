@@ -14,4 +14,7 @@
         android:title="Clear All Items"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/delete_group"
+        android:title="Delete Group"
+        app:showAsAction="never"/>
 </menu>
