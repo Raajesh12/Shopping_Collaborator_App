@@ -291,6 +291,8 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                             return;
                         }
                         double actual = Double.parseDouble(actualInput);
+                        int actualInt = (int) (actual * 100);
+                        actual =  actualInt/100.0;
                         UpdateItemRequest request = new UpdateItemRequest(itemName, estimate, actual, done);
                         Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.updateItem(gid, request);
                         call.enqueue(new Callback<Void>() {
