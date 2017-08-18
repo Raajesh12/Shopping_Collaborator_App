@@ -7,9 +7,10 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class UpdateItemRequest {
-    public UpdateItemRequest(String itemName, double estimate, boolean done){
+    public UpdateItemRequest(String itemName, double estimate, double actual, boolean done){
         this.itemName = itemName;
         this.estimate = estimate;
+        this.actual = actual;
         this.done = done;
     }
 
@@ -19,6 +20,11 @@ public class UpdateItemRequest {
     @SerializedName("estimate")
     private double estimate;
 
+    @SerializedName("actual")
+    private double actual;
+
     @SerializedName("done")
     private boolean done;
+
+
 }

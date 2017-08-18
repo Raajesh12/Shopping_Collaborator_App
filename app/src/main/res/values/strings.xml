@@ -24,4 +24,8 @@
     <string name="estimate_input_hint">Enter the estimated price</string>
     <string name="owner_cant_leave">As the owner, you cannot leave the group, but you can delete it.</string>
     <string name="you_left_group">You have left the group!</string>
+    <string name="item_delete_error_message">Please fill in an actual price!</string>
+    <string name="item_mark_done">Item has been deleted and price added to total.</string>
+    <string name="actual_price">Actual Price</string>
+    <string name="actual_price_message">Enter an actual price for the item to remove it from the list.</string>
 </resources>

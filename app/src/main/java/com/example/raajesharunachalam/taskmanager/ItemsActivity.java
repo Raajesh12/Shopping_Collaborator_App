@@ -9,7 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +28,7 @@ import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.ItemEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.CreateItemRequest;
+import com.example.raajesharunachalam.taskmanager.requests.UpdateItemRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Item;
 import com.example.raajesharunachalam.taskmanager.responses.ItemIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
@@ -40,6 +43,18 @@ public class ItemsActivity extends AppCompatActivity {
     public static long uid;
     RecyclerView rv;
     ItemsAdapter adapter;
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("Lifecycle", "onPause() called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("Lifecycle", "onResume() called");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,6 +233,7 @@ public class ItemsActivity extends AppCompatActivity {
                     Item[] items = response.body().getItems();
                     adapter = new ItemsAdapter(items);
                     rv.setAdapter(adapter);
+                    initializeItemTouchHelper();
                 } else {
                     Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
@@ -230,6 +246,85 @@ public class ItemsActivity extends AppCompatActivity {
         });
     }
 
+    public void initializeItemTouchHelper(){
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                final Long gid = (Long) viewHolder.itemView.getTag();
+                ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                final String itemName = holder.itemName.getText().toString();
+                final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
+                final boolean done = true;
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
+                alertDialog.setTitle(R.string.actual_price);
+                alertDialog.setMessage(R.string.actual_price_message);
+
+                LinearLayout container = new LinearLayout(ItemsActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText actualPriceInput = new EditText(ItemsActivity.this);
+                actualPriceInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                actualPriceInput.setHint(R.string.item_input_hint);
+                LinearLayout.LayoutParams actualPriceParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                actualPriceParams.topMargin = 0;
+                actualPriceParams.leftMargin = 100;
+                actualPriceParams.rightMargin = 100;
+                actualPriceParams.bottomMargin = 0;
+                actualPriceInput.setLayoutParams(actualPriceParams);
+
+                container.addView(actualPriceInput);
+                alertDialog.setView(container);
+
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String actualInput = actualPriceInput.getText().toString();
+                        if(actualInput.length() == 0){
+                            Toast.makeText(ItemsActivity.this, R.string.item_delete_error_message, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        double actual = Double.parseDouble(actualInput);
+                        UpdateItemRequest request = new UpdateItemRequest(itemName, estimate, actual, done);
+                        Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.updateItem(gid, request);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(ItemsActivity.this, R.string.item_mark_done, Toast.LENGTH_LONG).show();
+                                } else{
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                                refreshRecyclerView(gid);
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                refreshRecyclerView(gid);
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.show();
+            }
+        }).attachToRecyclerView(rv);
+    }
+
     public void refreshRecyclerView(final long gid) {
         Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
@@ -238,6 +333,7 @@ public class ItemsActivity extends AppCompatActivity {
             public void onResponse(Call<ItemListResponse> call, Response<ItemListResponse> response) {
                 if(response.code() == ResponseCodes.HTTP_OK){
                     Item[] items = response.body().getItems();
+                    Log.d("ItemsView", String.valueOf(items.length));
                     adapter.setItems(items);
                     adapter.notifyDataSetChanged();
                 }
