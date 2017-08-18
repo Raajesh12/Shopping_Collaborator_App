@@ -19,6 +19,9 @@ public class Item {
     @SerializedName("item_name")
     private String itemName;
 
+    @SerializedName("estimate")
+    private double estimate;
+
     public long getItemId() {return itemId;}
 
     public String getFirstName() {
@@ -31,5 +34,9 @@ public class Item {
 
     public String getItemName() {
         return itemName;
+    }
+
+    public double getEstimate(){
+        return estimate;
     }
 }

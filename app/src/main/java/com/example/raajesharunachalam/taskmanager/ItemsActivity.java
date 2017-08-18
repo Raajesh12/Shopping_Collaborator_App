@@ -251,7 +251,7 @@ public class ItemsActivity extends AppCompatActivity {
         });
     }
 
-    public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHolder>{
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemsViewHolder>{
 
         Item[] items;
         public ItemsAdapter(Item[] items){
@@ -278,8 +278,15 @@ public class ItemsActivity extends AppCompatActivity {
             Item item = items[position];
             if(item.getItemName() != null) {
                 holder.itemName.setText(item.getItemName());
+
                 String name = item.getFirstName() + " " + item.getLastName();
                 holder.itemAuthor.setText(name);
+
+                double estimate = item.getEstimate();
+                holder.estimate.setText(String.valueOf(estimate));
+
+                Long itemId = new Long(item.getItemId());
+                holder.itemView.setTag(itemId);
             }
         }
 
@@ -287,15 +294,17 @@ public class ItemsActivity extends AppCompatActivity {
         public int getItemCount() {
             return items.length;
         }
+    }
 
-        public class ItemsViewHolder extends RecyclerView.ViewHolder{
-            public TextView itemName;
-            public TextView itemAuthor;
-            public ItemsViewHolder(View itemView) {
-                super(itemView);
-                itemName = (TextView) itemView.findViewById(R.id.task_description);
-                itemAuthor = (TextView) itemView.findViewById(R.id.task_author);
-            }
+    public class ItemsViewHolder extends RecyclerView.ViewHolder{
+        public TextView itemName;
+        public TextView itemAuthor;
+        public TextView estimate;
+        public ItemsViewHolder(View itemView) {
+            super(itemView);
+            itemName = (TextView) itemView.findViewById(R.id.task_description);
+            itemAuthor = (TextView) itemView.findViewById(R.id.task_author);
+            estimate = (TextView) itemView.findViewById(R.id.item_estimate);
         }
     }
 }

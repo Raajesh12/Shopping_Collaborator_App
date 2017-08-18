@@ -6,24 +6,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/task_description"
+        android:id="@+id/item_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:textSize="24dp"
+        android:textSize="20sp"
         android:layout_marginTop="25dp"
         android:layout_marginLeft="25dp"
+        android:layout_marginRight="120dp"
         tools:text="Buy 2 gallons of 2% milk"/>
     <TextView
-        android:id="@+id/task_author"
+        android:id="@+id/item_author"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/task_description"
-        app:layout_constraintLeft_toLeftOf="@+id/task_description"
+        app:layout_constraintTop_toBottomOf="@+id/item_description"
+        app:layout_constraintLeft_toLeftOf="@+id/item_description"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
         tools:text="By: Raajesh Arunachalam"/>
+    <TextView
+        android:id="@+id/item_estimate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/item_description"
+        app:layout_constraintLeft_toRightOf="@id/item_description"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="15dp"
+        android:textSize="20sp"
+        tools:text="$250.78"/>
 
 </android.support.constraint.ConstraintLayout>
