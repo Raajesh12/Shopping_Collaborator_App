@@ -63,18 +63,20 @@ public class GroupsActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
                         if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
-                            refreshRecyclerView(uid);
+                            Toast.makeText(GroupsActivity.this, R.string.you_left_group, Toast.LENGTH_LONG).show();
                         }
                         else if (response.code() == ResponseCodes.HTTP_BAD_REQUEST){
                             Toast.makeText(GroupsActivity.this, R.string.owner_cant_leave, Toast.LENGTH_LONG).show();
                         } else{
                             Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                         }
+                        refreshRecyclerView(uid);
                     }
 
                     @Override
                     public void onFailure(Call<Void> call, Throwable t) {
-                        Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                        refreshRecyclerView(uid);
                     }
                 });
             }

@@ -22,5 +22,6 @@
     <string name="add_item_button">Add Item</string>
     <string name="task_input_hint">Enter name of item</string>
     <string name="estimate_input_hint">Enter the estimated price</string>
-    <string name="owner_cant_leave">As the owner, you cannot leave the group.</string>
+    <string name="owner_cant_leave">As the owner, you cannot leave the group, but you can delete it.</string>
+    <string name="you_left_group">You have left the group!</string>
 </resources>
