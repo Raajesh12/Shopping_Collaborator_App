@@ -7,9 +7,10 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class UpdateItemRequest {
-    public UpdateItemRequest(String itemName, double estimate){
+    public UpdateItemRequest(String itemName, double estimate, boolean done){
         this.itemName = itemName;
         this.estimate = estimate;
+        this.done = done;
     }
 
     @SerializedName("item_name")
@@ -17,4 +18,7 @@ public class UpdateItemRequest {
 
     @SerializedName("estimate")
     private double estimate;
+
+    @SerializedName("done")
+    private boolean done;
 }
