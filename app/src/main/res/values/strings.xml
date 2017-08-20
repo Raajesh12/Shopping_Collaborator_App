@@ -36,4 +36,8 @@
     <string name="delete_group_warning">Are you sure you want to delete this group? This action cannot be undone.</string>
     <string name="group_deleted">Group Deleted Successfully</string>
     <string name="only_owner_delete_message">Only the group owner can delete the group</string>
+    <string name="items_bought_label">Items Purchased:</string>
+    <string name="total_cost_label">Total Cost:</string>
+    <string name="item_name_label"><u>Name</u></string>
+    <string name="item_estimate_label"><u>Estimate</u></string>
 </resources>

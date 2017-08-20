@@ -5,6 +5,8 @@ import com.example.raajesharunachalam.taskmanager.requests.UpdateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
+import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
+import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -38,6 +40,15 @@ public interface GroupEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/groups/{gid}")
     Call<Void> deleteGroup(@Path("gid") long gid, @Query("uid") long uid);
+
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @GET("/add_total_price")
+    Call<TotalPriceResponse> getGroupPriceTotal(@Query("gid") long gid);
+
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @GET("/items_completed")
+    Call<ItemsCompletedResponse> getItemsCompleted(@Query("gid") long gid);
+
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://taskmanager.host")

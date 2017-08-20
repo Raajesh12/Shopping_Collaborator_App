@@ -35,6 +35,8 @@ import com.example.raajesharunachalam.taskmanager.requests.UpdateItemRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Item;
 import com.example.raajesharunachalam.taskmanager.responses.ItemIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
+import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
+import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,6 +49,8 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     private static long uid;
     RecyclerView rv;
     ItemsAdapter adapter;
+    TextView itemsBought;
+    TextView totalCost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         uid = intent.getLongExtra(IntentKeys.UID, 0L);
 
         rv = (RecyclerView) findViewById(R.id.recycle_items);
-        initializeRecyclerView(gid);
+        initializeScreen(gid);
+
+        itemsBought = (TextView) findViewById(R.id.tv_items_bought_actual);
+        totalCost = (TextView) findViewById(R.id.tv_total_cost_actual);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
         Log.d("SharedPreferences", String.valueOf(sharedPreferences.getBoolean(REFRESH_KEY, false)));
@@ -118,7 +125,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                                 @Override
                                 public void onResponse(Call<ItemIDResponse> call, Response<ItemIDResponse> response) {
                                     if(response.code() == ResponseCodes.HTTP_CREATED) {
-                                        refreshRecyclerView(gid, true);
+                                        refreshScreen(gid, true);
                                     } else {
                                         Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                     }
@@ -227,7 +234,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
                                     Toast.makeText(ItemsActivity.this, R.string.deleted_all_items,Toast.LENGTH_LONG).show();
-                                    refreshRecyclerView(gid, true);
+                                    refreshScreen(gid, true);
                                 }
                                 else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
                                     Toast.makeText(ItemsActivity.this, R.string.only_owner_clear_message, Toast.LENGTH_LONG).show();
@@ -296,7 +303,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
     }
 
-    public void initializeRecyclerView(final long gid) {
+    public void initializeScreen(final long gid) {
         Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
         call.enqueue(new Callback<ItemListResponse>() {
@@ -317,6 +324,42 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
             @Override
             public void onFailure(Call<ItemListResponse> call, Throwable t) {
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        Call<TotalPriceResponse> priceCall = GroupEndpoints.groupEndpoints.getGroupPriceTotal(gid);
+        priceCall.enqueue(new Callback<TotalPriceResponse>() {
+            @Override
+            public void onResponse(Call<TotalPriceResponse> call, Response<TotalPriceResponse> response) {
+                if(response.code() == ResponseCodes.HTTP_OK){
+                    totalCost.setText("$" + response.body().getTotal());
+                } else {
+                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TotalPriceResponse> call, Throwable t) {
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+        Call<ItemsCompletedResponse> itemsCompletedCall = GroupEndpoints.groupEndpoints.getItemsCompleted(gid);
+        Log.d("ItemsURL", itemsCompletedCall.request().url().toString());
+        itemsCompletedCall.enqueue(new Callback<ItemsCompletedResponse>() {
+            @Override
+            public void onResponse(Call<ItemsCompletedResponse> call, Response<ItemsCompletedResponse> response) {
+                if(response.code() == ResponseCodes.HTTP_OK){
+                    itemsBought.setText(response.body().getItemsString());
+                } else {
+                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ItemsCompletedResponse> call, Throwable t) {
                 Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
             }
         });
@@ -398,7 +441,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        refreshRecyclerView(gid, false);
+                        refreshScreen(gid, false);
                         dialog.dismiss();
                     }
                 });
@@ -407,7 +450,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }).attachToRecyclerView(rv);
     }
 
-    public void refreshRecyclerView(final long gid, boolean makeAPICall) {
+    public void refreshScreen(final long gid, boolean makeAPICall) {
         if(makeAPICall) {
             Call<ItemListResponse> call = ItemEndpoints.ITEM_ENDPOINTS.getItems(gid);
 
@@ -431,6 +474,40 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         } else {
             adapter.notifyDataSetChanged();
         }
+
+        Call<TotalPriceResponse> call = GroupEndpoints.groupEndpoints.getGroupPriceTotal(gid);
+        call.enqueue(new Callback<TotalPriceResponse>() {
+            @Override
+            public void onResponse(Call<TotalPriceResponse> call, Response<TotalPriceResponse> response) {
+                if(response.code() == ResponseCodes.HTTP_OK){
+                    totalCost.setText("$" + response.body().getTotal());
+                } else {
+                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TotalPriceResponse> call, Throwable t) {
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG);
+            }
+        });
+
+        Call<ItemsCompletedResponse> itemsCompletedCall = GroupEndpoints.groupEndpoints.getItemsCompleted(gid);
+        itemsCompletedCall.enqueue(new Callback<ItemsCompletedResponse>() {
+            @Override
+            public void onResponse(Call<ItemsCompletedResponse> call, Response<ItemsCompletedResponse> response) {
+                if(response.code() == ResponseCodes.HTTP_OK){
+                    itemsBought.setText(response.body().getItemsString());
+                } else {
+                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ItemsCompletedResponse> call, Throwable t) {
+                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -438,7 +515,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         if(key.equals(REFRESH_KEY) && sharedPreferences.getBoolean(REFRESH_KEY, false) == true) {
             Log.d("SharedPreferences", "Refreshed");
             sharedPreferences.edit().putBoolean(REFRESH_KEY, false).apply();
-            refreshRecyclerView(gid, true);
+            refreshScreen(gid, true);
         }
     }
 
