@@ -24,7 +24,7 @@ import retrofit2.http.Path;
 public interface UserEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @GET("/users/{uid}")
-    Call<UserInfoResponse> getUserInfo(@Path("uid") int uid);
+    Call<UserInfoResponse> getUserInfo(@Path("uid") long uid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/users/")
@@ -32,11 +32,11 @@ public interface UserEndpoints {
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @PUT("/users/{uid}")
-    Call<Void> updateUser(@Path("uid") int uid, @Body UpdateUserRequest updateUserRequest);
+    Call<Void> updateUser(@Path("uid") long uid, @Body UpdateUserRequest updateUserRequest);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/users/{uid}")
-    Call<Void> deleteUser(@Path("uid") int uid);
+    Call<Void> deleteUser(@Path("uid") long uid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/validate_user")
