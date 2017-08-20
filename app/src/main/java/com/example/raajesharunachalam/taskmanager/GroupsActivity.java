@@ -10,21 +10,32 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputType;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
+import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.CreateGroupRequest;
+import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
+import com.example.raajesharunachalam.taskmanager.responses.UIDResponse;
 
+import java.io.IOException;
+
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -138,6 +149,175 @@ public class GroupsActivity extends AppCompatActivity {
                 alertDialog.show();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inf = getMenuInflater();
+        inf.inflate(R.menu.groups_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.delete_account:
+                AlertDialog.Builder dialog = new AlertDialog.Builder(GroupsActivity.this);
+                dialog.setTitle(R.string.confirm_credentials_title);
+                dialog.setMessage(R.string.confirm_credentials_for_delete);
+
+                LinearLayout container = new LinearLayout(GroupsActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText email = new EditText(GroupsActivity.this);
+                email.setHint("Email");
+                LinearLayout.LayoutParams emailParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                emailParams.topMargin = 0;
+                emailParams.leftMargin = 100;
+                emailParams.rightMargin = 100;
+                emailParams.bottomMargin = 0;
+                email.setLayoutParams(emailParams);
+
+                final EditText password = new EditText(GroupsActivity.this);
+                password.setHint("Password");
+                password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                LinearLayout.LayoutParams passwordParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                passwordParams.topMargin = 50;
+                passwordParams.leftMargin = 100;
+                passwordParams.rightMargin = 100;
+                passwordParams.bottomMargin = 50;
+                password.setLayoutParams(passwordParams);
+
+                container.addView(email);
+                container.addView(password);
+                dialog.setView(container);
+
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String emailString = email.getText().toString();
+                        String passwordString = password.getText().toString();
+                        ValidateUserRequest request = new ValidateUserRequest(emailString, passwordString);
+                        Call<UIDResponse> call = UserEndpoints.userEndpoints.validateUser(request);
+                        call.enqueue(new Callback<UIDResponse>() {
+                            @Override
+                            public void onResponse(Call<UIDResponse> call, Response<UIDResponse> response) {
+                                if(response.code()==ResponseCodes.HTTP_OK){
+                                    Call<Void> call1 = UserEndpoints.userEndpoints.deleteUser(uid);
+                                    call1.enqueue(new Callback<Void>() {
+                                        @Override
+                                        public void onResponse(Call<Void> call, Response<Void> response) {
+                                            if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
+                                                Toast.makeText(GroupsActivity.this, R.string.account_deleted, Toast.LENGTH_LONG).show();
+                                                GroupsActivity.this.finish();
+                                            }else{
+                                                Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Void> call, Throwable t) {
+                                            Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                    Toast.makeText(GroupsActivity.this, R.string.invalid_credentials, Toast.LENGTH_LONG).show();
+                                }else{
+                                    Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<UIDResponse> call, Throwable t) {
+                                Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+
+                dialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+                return true;
+            case R.id.edit_account_info:
+                AlertDialog.Builder dialog1 = new AlertDialog.Builder(GroupsActivity.this);
+                dialog1.setTitle(R.string.confirm_credentials_title);
+                dialog1.setMessage(R.string.confirm_credentials_for_edit);
+
+                LinearLayout container1 = new LinearLayout(GroupsActivity.this);
+                container1.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container1.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText email1 = new EditText(GroupsActivity.this);
+                email1.setHint("Email");
+                LinearLayout.LayoutParams emailParams1 = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                emailParams1.topMargin = 0;
+                emailParams1.leftMargin = 100;
+                emailParams1.rightMargin = 100;
+                emailParams1.bottomMargin = 0;
+                email1.setLayoutParams(emailParams1);
+
+                final EditText password1 = new EditText(GroupsActivity.this);
+                password1.setHint("Password");
+                password1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                LinearLayout.LayoutParams passwordParams1 = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                passwordParams1.topMargin = 50;
+                passwordParams1.leftMargin = 100;
+                passwordParams1.rightMargin = 100;
+                passwordParams1.bottomMargin = 50;
+                password1.setLayoutParams(passwordParams1);
+
+                container1.addView(email1);
+                container1.addView(password1);
+                dialog1.setView(container1);
+
+                dialog1.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String emailString = email1.getText().toString();
+                        String passwordString = password1.getText().toString();
+                        ValidateUserRequest request = new ValidateUserRequest(emailString, passwordString);
+                        Call<UIDResponse> call = UserEndpoints.userEndpoints.validateUser(request);
+                        call.enqueue(new Callback<UIDResponse>() {
+                            @Override
+                            public void onResponse(Call<UIDResponse> call, Response<UIDResponse> response) {
+                                if(response.code()==ResponseCodes.HTTP_OK){
+                                    Intent i = new Intent(GroupsActivity.this, EditAccountInfo.class);
+                                    i.putExtra(IntentKeys.UID, uid);
+                                    startActivity(i);
+                                }else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                    Toast.makeText(GroupsActivity.this, R.string.invalid_credentials, Toast.LENGTH_LONG).show();
+                                }else{
+                                    Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<UIDResponse> call, Throwable t) {
+                                Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }
+                });
+
+                dialog1.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog1.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

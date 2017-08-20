@@ -40,4 +40,9 @@
     <string name="total_cost_label">Total Cost:</string>
     <string name="item_name_label"><u>Name</u></string>
     <string name="item_estimate_label"><u>Estimate</u></string>
+    <string name="account_updated">Account info has been successfully updated.</string>
+    <string name="confirm_credentials_title">Confirm Credentials</string>
+    <string name="confirm_credentials_for_edit">Please confirm your email and password to edit your account details.</string>
+    <string name="confirm_credentials_for_delete">Please confirm your email and password to permanently delete your account.</string>
+    <string name="account_deleted">Account deleted.</string>
 </resources>

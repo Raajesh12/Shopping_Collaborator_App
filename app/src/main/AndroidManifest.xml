@@ -26,7 +26,8 @@
             android:label="Sign Up Page" />
         <activity android:name=".GroupsActivity" />
         <activity android:name=".ItemsActivity" />
-        <activity android:name=".UsersInGroupActivity"></activity>
+        <activity android:name=".UsersInGroupActivity" />
+        <activity android:name=".EditAccountInfo"></activity>
     </application>
 
 </manifest>
