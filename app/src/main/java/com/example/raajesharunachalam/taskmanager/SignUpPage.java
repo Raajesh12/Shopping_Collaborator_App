@@ -67,7 +67,6 @@ public class SignUpPage extends AppCompatActivity {
                     startActivity(intent);
                 }
 
-
             }
 
             @Override
