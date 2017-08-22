@@ -72,15 +72,35 @@ public class EditAccountInfo extends AppCompatActivity {
         String email = emailEdit.getText().toString();
         EditText passwordEdit = (EditText) findViewById(R.id.passwordfield);
         String password = passwordEdit.getText().toString();
-        if(!oldFirstName.equals(firstName) || !oldLastName.equals(lastName) || !oldEmail.equals(email) ||
-                !oldPassword.equals(password)) {
+        boolean firstNameFlag = oldFirstName.equals(firstName);
+        boolean lastNameFlag = oldLastName.equals(lastName);
+        boolean emailFlag = oldEmail.equals(email);
+        boolean passwordFlag = oldPassword.equals(password);
+
+        if( !firstNameFlag || !lastNameFlag || !emailFlag || !passwordFlag) {
 
 
             UpdateUserRequest request = new UpdateUserRequest();
-            request.setFirstName(firstName);
-            request.setLastName(lastName);
-            request.setEmail(email);
-            request.setPassword(password);
+            if(firstNameFlag){
+                request.setFirstName(null);
+            }else{
+                request.setFirstName(firstName);
+            }
+            if(lastNameFlag){
+                request.setLastName(null);
+            }else{
+                request.setLastName(lastName);
+            }
+            if(emailFlag){
+                request.setEmail(null);
+            }else{
+                request.setEmail(email);
+            }
+            if(passwordFlag){
+                request.setPassword(null);
+            }else{
+                request.setPassword(password);
+            }
 
             Call<Void> call = UserEndpoints.userEndpoints.updateUser(uid, request);
             call.enqueue(new Callback<Void>() {
