@@ -422,6 +422,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                     public void onClick(DialogInterface dialog, int which) {
                         String newestimate = estimateInput.getText().toString();
                         String newname = itemInput.getText().toString();
+                        if(newestimate.length() == 0 || newname.length() == 0){
+                            Toast.makeText(ItemsActivity.this, R.string.fields_blank, Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         double newestimate1 = Double.parseDouble(newestimate);
                         int estimateInt = (int) (newestimate1 * 100);
                         double estimateFinished = estimateInt/100.0;
