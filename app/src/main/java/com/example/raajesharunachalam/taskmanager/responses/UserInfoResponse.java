@@ -16,6 +16,9 @@ public class UserInfoResponse {
     @SerializedName("email")
     private String email;
 
+    @SerializedName("password")
+    private String password;
+
     public String getFirstName(){
         return firstName;
     }
@@ -27,4 +30,6 @@ public class UserInfoResponse {
     public String getEmail(){
         return email;
     }
+
+    public String getPassword() { return password; }
 }

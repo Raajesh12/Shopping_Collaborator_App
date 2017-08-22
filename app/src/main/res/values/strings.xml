@@ -58,4 +58,6 @@
     <string name="delete_items_success_message">The items have been deleted successfully</string>
     <string name="delete_items_none">No Items Were Selected To Delete</string>
     <string name="add_user_already_in_group">The user you are trying to add is already in the group!</string>
+    <string name="no_fields_changed">No fields were changed.</string>
+    <string name="no_items_to_remove">There Are Currently No Remaining Items On Your List That Can Be Removed!</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.raajesharunachalam.taskmanager.endpoints;
 
 import com.example.raajesharunachalam.taskmanager.requests.CreateUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
+import com.example.raajesharunachalam.taskmanager.requests.ValidateCurrentUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.UIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.UserInfoResponse;
@@ -41,6 +42,10 @@ public interface UserEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/validate_user")
     Call<UIDResponse> validateUser(@Body ValidateUserRequest validateUserRequest);
+
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @POST("/validate_current_user")
+    Call<Void> validateCurrentUser(@Body ValidateCurrentUserRequest validateCurrentUserRequest);
 
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://taskmanager.host")
