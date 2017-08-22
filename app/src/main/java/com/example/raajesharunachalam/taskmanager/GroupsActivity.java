@@ -28,6 +28,7 @@ import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.CreateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateGroupRequest;
+import com.example.raajesharunachalam.taskmanager.requests.ValidateCurrentUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
@@ -72,12 +73,11 @@ public class GroupsActivity extends AppCompatActivity {
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {
-                        if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                        if (response.code() == ResponseCodes.HTTP_NO_CONTENT) {
                             Toast.makeText(GroupsActivity.this, R.string.you_left_group, Toast.LENGTH_LONG).show();
-                        }
-                        else if (response.code() == ResponseCodes.HTTP_BAD_REQUEST){
+                        } else if (response.code() == ResponseCodes.HTTP_BAD_REQUEST) {
                             Toast.makeText(GroupsActivity.this, R.string.owner_cant_leave, Toast.LENGTH_LONG).show();
-                        } else{
+                        } else {
                             Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                         }
                         refreshRecyclerView(uid);
@@ -114,7 +114,7 @@ public class GroupsActivity extends AppCompatActivity {
                 final EditText groupNameInput = new EditText(GroupsActivity.this);
                 groupNameInput.setText(holder.groupName.getText().toString());
                 groupNameInput.setHint(R.string.update_group_hint);
-                LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 itemParams.topMargin = 0;
                 itemParams.leftMargin = 100;
                 itemParams.rightMargin = 100;
@@ -128,7 +128,7 @@ public class GroupsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String groupName = groupNameInput.getText().toString();
-                        if(groupName.length() == 0){
+                        if (groupName.length() == 0) {
                             Toast.makeText(GroupsActivity.this, R.string.update_group_error, Toast.LENGTH_LONG).show();
                             refreshRecyclerView(uid);
                             return;
@@ -138,9 +138,9 @@ public class GroupsActivity extends AppCompatActivity {
                         call.enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
-                                if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                if (response.code() == ResponseCodes.HTTP_NO_CONTENT) {
                                     Toast.makeText(GroupsActivity.this, R.string.update_group_successful_message, Toast.LENGTH_LONG).show();
-                                } else{
+                                } else {
                                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
                                 refreshRecyclerView(uid);
@@ -175,7 +175,7 @@ public class GroupsActivity extends AppCompatActivity {
                 alertDialog.setMessage(R.string.add_group_message);
                 final EditText input = new EditText(GroupsActivity.this);
                 FrameLayout container = new FrameLayout(GroupsActivity.this);
-                FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 params.topMargin = 0;
                 params.leftMargin = 100;
                 params.rightMargin = 100;
@@ -187,7 +187,7 @@ public class GroupsActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String inputText = input.getText().toString();
-                        if(inputText.length() == 0){
+                        if (inputText.length() == 0) {
                             Toast.makeText(GroupsActivity.this, R.string.create_group_no_text_message, Toast.LENGTH_LONG).show();
                         } else {
                             final CreateGroupRequest request = new CreateGroupRequest(uid, inputText);
@@ -196,7 +196,7 @@ public class GroupsActivity extends AppCompatActivity {
                             call.enqueue(new Callback<GIDResponse>() {
                                 @Override
                                 public void onResponse(Call<GIDResponse> call, Response<GIDResponse> response) {
-                                    if(response.code() == ResponseCodes.HTTP_CREATED) {
+                                    if (response.code() == ResponseCodes.HTTP_CREATED) {
                                         refreshRecyclerView(uid);
                                     } else {
                                         Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
@@ -234,7 +234,7 @@ public class GroupsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.delete_account:
                 AlertDialog.Builder dialog = new AlertDialog.Builder(GroupsActivity.this);
                 dialog.setTitle(R.string.confirm_credentials_title);
@@ -246,7 +246,7 @@ public class GroupsActivity extends AppCompatActivity {
 
                 final EditText email = new EditText(GroupsActivity.this);
                 email.setHint("Email");
-                LinearLayout.LayoutParams emailParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams emailParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 emailParams.topMargin = 0;
                 emailParams.leftMargin = 100;
                 emailParams.rightMargin = 100;
@@ -256,7 +256,7 @@ public class GroupsActivity extends AppCompatActivity {
                 final EditText password = new EditText(GroupsActivity.this);
                 password.setHint("Password");
                 password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                LinearLayout.LayoutParams passwordParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams passwordParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 passwordParams.topMargin = 50;
                 passwordParams.leftMargin = 100;
                 passwordParams.rightMargin = 100;
@@ -272,22 +272,24 @@ public class GroupsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String emailString = email.getText().toString();
                         String passwordString = password.getText().toString();
-                        ValidateUserRequest request = new ValidateUserRequest(emailString, passwordString);
-                        Call<UIDResponse> call = UserEndpoints.userEndpoints.validateUser(request);
-                        call.enqueue(new Callback<UIDResponse>() {
+                        ValidateCurrentUserRequest request = new ValidateCurrentUserRequest(uid, emailString, passwordString);
+                        Call<Void> call = UserEndpoints.userEndpoints.validateCurrentUser(request);
+                        call.enqueue(new Callback<Void>() {
                             @Override
-                            public void onResponse(Call<UIDResponse> call, Response<UIDResponse> response) {
-                                if(response.code()==ResponseCodes.HTTP_OK){
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.code() == ResponseCodes.HTTP_OK) {
                                     Call<Void> call1 = UserEndpoints.userEndpoints.deleteUser(uid);
                                     call1.enqueue(new Callback<Void>() {
                                         @Override
                                         public void onResponse(Call<Void> call, Response<Void> response) {
-                                            if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
+                                            if (response.code() == ResponseCodes.HTTP_NO_CONTENT) {
                                                 Toast.makeText(GroupsActivity.this, R.string.account_deleted, Toast.LENGTH_LONG).show();
                                                 Intent intent = new Intent(GroupsActivity.this, MainActivity.class);
                                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                 startActivity(intent);
-                                            }else{
+                                            } else if (response.code() == ResponseCodes.HTTP_UNAUTHORIZED){
+                                                Toast.makeText(GroupsActivity.this, R.string.invalid_credentials, Toast.LENGTH_LONG).show();
+                                            } else {
                                                 Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                             }
                                         }
@@ -297,15 +299,15 @@ public class GroupsActivity extends AppCompatActivity {
                                             Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
                                         }
                                     });
-                                }else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                } else if (response.code() == ResponseCodes.HTTP_UNAUTHORIZED) {
                                     Toast.makeText(GroupsActivity.this, R.string.invalid_credentials, Toast.LENGTH_LONG).show();
-                                }else{
+                                } else {
                                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
                             }
 
                             @Override
-                            public void onFailure(Call<UIDResponse> call, Throwable t) {
+                            public void onFailure(Call<Void> call, Throwable t) {
                                 Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
                             }
                         });
@@ -333,7 +335,7 @@ public class GroupsActivity extends AppCompatActivity {
 
                 final EditText email1 = new EditText(GroupsActivity.this);
                 email1.setHint("Email");
-                LinearLayout.LayoutParams emailParams1 = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams emailParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 emailParams1.topMargin = 0;
                 emailParams1.leftMargin = 100;
                 emailParams1.rightMargin = 100;
@@ -343,7 +345,7 @@ public class GroupsActivity extends AppCompatActivity {
                 final EditText password1 = new EditText(GroupsActivity.this);
                 password1.setHint("Password");
                 password1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                LinearLayout.LayoutParams passwordParams1 = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams passwordParams1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 passwordParams1.topMargin = 50;
                 passwordParams1.leftMargin = 100;
                 passwordParams1.rightMargin = 100;
@@ -359,24 +361,24 @@ public class GroupsActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String emailString = email1.getText().toString();
                         String passwordString = password1.getText().toString();
-                        ValidateUserRequest request = new ValidateUserRequest(emailString, passwordString);
-                        Call<UIDResponse> call = UserEndpoints.userEndpoints.validateUser(request);
-                        call.enqueue(new Callback<UIDResponse>() {
+                        ValidateCurrentUserRequest request = new ValidateCurrentUserRequest(uid, emailString, passwordString);
+                        Call<Void> call = UserEndpoints.userEndpoints.validateCurrentUser(request);
+                        call.enqueue(new Callback<Void>() {
                             @Override
-                            public void onResponse(Call<UIDResponse> call, Response<UIDResponse> response) {
-                                if(response.code()==ResponseCodes.HTTP_OK){
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.code() == ResponseCodes.HTTP_NO_CONTENT) {
                                     Intent i = new Intent(GroupsActivity.this, EditAccountInfo.class);
                                     i.putExtra(IntentKeys.UID, uid);
                                     startActivity(i);
-                                }else if(response.code()==ResponseCodes.HTTP_UNAUTHORIZED){
+                                } else if (response.code() == ResponseCodes.HTTP_UNAUTHORIZED) {
                                     Toast.makeText(GroupsActivity.this, R.string.invalid_credentials, Toast.LENGTH_LONG).show();
-                                }else{
+                                } else {
                                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
                             }
 
                             @Override
-                            public void onFailure(Call<UIDResponse> call, Throwable t) {
+                            public void onFailure(Call<Void> call, Throwable t) {
                                 Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
                             }
                         });
@@ -406,7 +408,7 @@ public class GroupsActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         startCalls++;
-        if(startCalls > 1) {
+        if (startCalls > 1) {
             refreshRecyclerView(uid);
         }
     }
