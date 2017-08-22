@@ -50,6 +50,10 @@ public class SignUpPage extends AppCompatActivity {
             return;
         }
 
+        if(email.indexOf("@") < 0 || email.indexOf(".") < 0){
+            Toast.makeText(this, R.string.email_invalid, Toast.LENGTH_LONG).show();
+        }
+
         CreateUserRequest request = new CreateUserRequest(first_name, last_name, email, password);
         Call<UIDResponse> call = UserEndpoints.userEndpoints.createUser(request);
         call.enqueue(new Callback<UIDResponse>() {
