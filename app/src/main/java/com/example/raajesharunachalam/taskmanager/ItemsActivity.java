@@ -44,7 +44,10 @@ import retrofit2.Response;
 
 public class ItemsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String REFRESH_KEY = "Refresh";
+    private static final int NORMAL_ITEM = 100;
+    private static final int DELETE_ITEM = 200;
 
+    private static boolean deleteMode = false;
     private static long gid;
     private static long uid;
     RecyclerView rv;
@@ -629,7 +632,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             Context context = ItemsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
-            View view = myInflater.inflate(R.layout.item, parent, false);
+            View view;
+            if(viewType == NORMAL_ITEM){
+                view = myInflater.inflate(R.layout.item_normal_mode, parent, false);
+            }
 
             ItemsViewHolder viewHolder = new ItemsViewHolder(view);
             return viewHolder;
@@ -664,6 +670,15 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         @Override
         public int getItemCount() {
             return items.length;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(deleteMode) {
+                return DELETE_ITEM;
+            } else {
+                return NORMAL_ITEM;
+            }
         }
     }
 
