@@ -396,7 +396,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
                 final EditText actualPriceInput = new EditText(ItemsActivity.this);
                 actualPriceInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-                actualPriceInput.setHint(R.string.item_input_hint);
+                actualPriceInput.setHint(R.string.actual_price);
                 LinearLayout.LayoutParams actualPriceParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 actualPriceParams.topMargin = 0;
                 actualPriceParams.leftMargin = 100;
