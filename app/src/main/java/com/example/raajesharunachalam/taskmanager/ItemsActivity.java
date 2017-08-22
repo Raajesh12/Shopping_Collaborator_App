@@ -308,6 +308,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 startActivity(homeIntent);
                 return true;
             case R.id.remove_items:
+                if(adapter.getItems().length == 0){
+                    Toast.makeText(ItemsActivity.this, R.string.no_items_to_remove, Toast.LENGTH_LONG).show();
+                    return true;
+                }
                 deleteMode = true;
                 adapter.notifyDataSetChanged();
                 deleteItems.setVisibility(View.VISIBLE);
@@ -648,6 +652,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
         public void setItems(Item[] items){
             this.items = items;
+        }
+
+        public Item[] getItems() {
+            return items;
         }
 
         @Override
