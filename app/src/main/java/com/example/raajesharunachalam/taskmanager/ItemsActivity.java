@@ -20,6 +20,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -38,19 +41,28 @@ import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ItemsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener{
     private static final String REFRESH_KEY = "Refresh";
+    private static final int NORMAL_ITEM = 100;
+    private static final int DELETE_ITEM = 200;
 
+    private static boolean deleteMode = false;
     private static long gid;
     private static long uid;
     RecyclerView rv;
     ItemsAdapter adapter;
     TextView itemsBought;
     TextView totalCost;
+    Button deleteItems;
+    FloatingActionButton addItem;
+    HashSet<Long> itemsToDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +75,11 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         rv = (RecyclerView) findViewById(R.id.recycle_items);
         initializeScreen(gid);
 
+        itemsToDelete = new HashSet<>();
+
         itemsBought = (TextView) findViewById(R.id.tv_items_bought_actual);
         totalCost = (TextView) findViewById(R.id.tv_total_cost_actual);
+        deleteItems = (Button) findViewById(R.id.delete_items_button);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
         Log.d("SharedPreferences", String.valueOf(sharedPreferences.getBoolean(REFRESH_KEY, false)));
@@ -72,10 +87,13 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
-        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_items_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        addItem = (FloatingActionButton) findViewById(R.id.add_items_button);
+        addItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(addItem.getVisibility() != View.VISIBLE){
+                    return;
+                }
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
                 alertDialog.setTitle(R.string.add_items_title);
                 alertDialog.setMessage(R.string.add_items_message);
@@ -151,6 +169,46 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 alertDialog.show();
             }
         });
+
+        deleteItems.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(deleteItems.getVisibility() ==  View.VISIBLE) {
+                    if(itemsToDelete.size() == 0){
+                        Toast.makeText(ItemsActivity.this, R.string.delete_items_none, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    long[] itemIds = new long[itemsToDelete.size()];
+                    int counter = 0;
+                    for(long itemId : itemsToDelete){
+                        itemIds[counter] = itemId;
+                        counter++;
+                    }
+                    Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.deleteItems(itemIds);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                Toast.makeText(ItemsActivity.this, R.string.delete_items_success_message, Toast.LENGTH_LONG).show();
+                                deleteMode = false;
+                                adapter.notifyDataSetChanged();
+                                deleteItems.setVisibility(View.GONE);
+                                addItem.setVisibility(View.VISIBLE);
+                                itemsToDelete.clear();
+                                refreshScreen(gid, true);
+                            } else {
+                                Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     @Override
@@ -163,60 +221,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.add_user:
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setTitle(R.string.add_user);
-                dialog.setMessage(R.string.add_user_to_group_message);
-                final EditText input = new EditText(ItemsActivity.this);
-                FrameLayout container = new FrameLayout(ItemsActivity.this);
-                FrameLayout.LayoutParams params =
-                        new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.topMargin = 50;
-                params.leftMargin = 100;
-                params.rightMargin = 100;
-                params.bottomMargin = 50;
-                input.setLayoutParams(params);
-                container.addView(input);
-                dialog.setView(container);
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String userEmail = input.getText().toString();
-                        AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
-                        Call<Void> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
-                        call.enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                if(response.code()==ResponseCodes.HTTP_CREATED){
-                                    Toast.makeText(ItemsActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
-                                }
-                                else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
-                                    Toast.makeText(ItemsActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
-                                }
-                                else{
-                                    Toast.makeText(ItemsActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                Toast.makeText(ItemsActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
-
-                            }
-                        });
-                        dialog.dismiss();
-                    }
-                });
-                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
-                return true;
-            case R.id.view_users:
+            case R.id.users:
                 Intent intent = new Intent(ItemsActivity.this, UsersInGroupActivity.class);
                 intent.putExtra(IntentKeys.GID, gid);
                 startActivity(intent);
@@ -296,11 +301,33 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                     }
                 });
                 dialog2.show();
-
+                return true;
+            case R.id.items_log_out_button:
+                Intent homeIntent = new Intent(ItemsActivity.this, MainActivity.class);
+                homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(homeIntent);
+                return true;
+            case R.id.remove_items:
+                deleteMode = true;
+                adapter.notifyDataSetChanged();
+                deleteItems.setVisibility(View.VISIBLE);
+                addItem.setVisibility(View.GONE);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        if(deleteMode){
+            deleteMode = false;
+            adapter.notifyDataSetChanged();
+            deleteItems.setVisibility(View.GONE);
+            addItem.setVisibility(View.VISIBLE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void initializeScreen(final long gid) {
@@ -366,6 +393,99 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     }
 
     public void initializeItemTouchHelper(){
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                final Long gid = (Long) viewHolder.itemView.getTag();
+                ItemViewHolder holder = (ItemViewHolder) viewHolder;
+                final int position = holder.getAdapterPosition();
+                final String itemName = holder.itemName.getText().toString();
+                final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
+                alertDialog.setTitle(R.string.edit_info);
+
+                LinearLayout container = new LinearLayout(ItemsActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText itemInput = new EditText(ItemsActivity.this);
+                itemInput.setText(itemName);
+                itemInput.setHint(R.string.item_input_hint);
+                LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                itemParams.topMargin = 0;
+                itemParams.leftMargin = 100;
+                itemParams.rightMargin = 100;
+                itemParams.bottomMargin = 0;
+                itemInput.setLayoutParams(itemParams);
+
+                final EditText estimateInput = new EditText(ItemsActivity.this);
+                estimateInput.setText(estimate + "");
+                estimateInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                estimateInput.setHint(R.string.estimate_input_hint);
+                LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                estimateParams.topMargin = 50;
+                estimateParams.leftMargin = 100;
+                estimateParams.rightMargin = 100;
+                estimateParams.bottomMargin = 50;
+                estimateInput.setLayoutParams(estimateParams);
+
+                container.addView(itemInput);
+                container.addView(estimateInput);
+                alertDialog.setView(container);
+
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newestimate = estimateInput.getText().toString();
+                        String newname = itemInput.getText().toString();
+                        if(newestimate.length() == 0 || newname.length() == 0){
+                            Toast.makeText(ItemsActivity.this, R.string.fields_blank, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        double newestimate1 = Double.parseDouble(newestimate);
+                        int estimateInt = (int) (newestimate1 * 100);
+                        double estimateFinished = estimateInt/100.0;
+                        UpdateItemRequest request = new UpdateItemRequest(newname, estimateFinished, 0.0, false);
+                        Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.updateItem(gid, request);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(ItemsActivity.this, R.string.item_updated, Toast.LENGTH_LONG).show();
+                                } else{
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        refreshScreen(gid, false);
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.show();
+            }
+        }).attachToRecyclerView(rv);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -375,7 +495,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 final Long gid = (Long) viewHolder.itemView.getTag();
-                ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                ItemViewHolder holder = (ItemViewHolder) viewHolder;
                 final int position = holder.getAdapterPosition();
                 final String itemName = holder.itemName.getText().toString();
                 final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
@@ -519,7 +639,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
     }
 
-    public class ItemsAdapter extends RecyclerView.Adapter<ItemsViewHolder>{
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder>{
 
         Item[] items;
         public ItemsAdapter(Item[] items){
@@ -531,18 +651,23 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
 
         @Override
-        public ItemsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = ItemsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
-            View view = myInflater.inflate(R.layout.item, parent, false);
-
-            ItemsViewHolder viewHolder = new ItemsViewHolder(view);
-            return viewHolder;
+            if(viewType == NORMAL_ITEM){
+                View view = myInflater.inflate(R.layout.item_normal_mode, parent, false);
+                ItemViewHolder viewHolder = new ItemViewHolder(view);
+                return viewHolder;
+            } else {
+                View view = myInflater.inflate(R.layout.item_delete_mode, parent, false);
+                ItemDeleteViewHolder viewHolder = new ItemDeleteViewHolder(view);
+                return viewHolder;
+            }
         }
 
         @Override
-        public void onBindViewHolder(ItemsViewHolder holder, int position) {
+        public void onBindViewHolder(ItemViewHolder holder, int position) {
             Item item = items[position];
             if(item.getItemName() != null) {
                 holder.itemName.setText(item.getItemName());
@@ -565,23 +690,60 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 Long itemId = new Long(item.getItemId());
                 holder.itemView.setTag(itemId);
             }
+
+            if(holder instanceof ItemDeleteViewHolder) {
+                final ItemDeleteViewHolder viewHolder = (ItemDeleteViewHolder) holder;
+                viewHolder.shouldDelete.setChecked(false);
+                viewHolder.shouldDelete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        Long itemId = (Long) viewHolder.itemView.getTag();
+                        if(isChecked){
+                            if(!(itemsToDelete.contains(itemId))){
+                                itemsToDelete.add(itemId);
+                            }
+                        } else {
+                            if(itemsToDelete.contains(itemId)) {
+                                itemsToDelete.remove(itemId);
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         @Override
         public int getItemCount() {
             return items.length;
         }
+
+        @Override
+        public int getItemViewType(int position) {
+            if(deleteMode) {
+                return DELETE_ITEM;
+            } else {
+                return NORMAL_ITEM;
+            }
+        }
     }
 
-    public class ItemsViewHolder extends RecyclerView.ViewHolder{
+    public class ItemViewHolder extends RecyclerView.ViewHolder{
         public TextView itemName;
         public TextView itemAuthor;
         public TextView estimate;
-        public ItemsViewHolder(View itemView) {
+        public ItemViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.item_description);
             itemAuthor = (TextView) itemView.findViewById(R.id.item_author);
             estimate = (TextView) itemView.findViewById(R.id.item_estimate);
+        }
+    }
+
+    public class ItemDeleteViewHolder extends ItemViewHolder {
+        public CheckBox shouldDelete;
+        public ItemDeleteViewHolder(View itemView) {
+            super(itemView);
+            shouldDelete = (CheckBox) itemView.findViewById(R.id.should_delete);
         }
     }
 }
