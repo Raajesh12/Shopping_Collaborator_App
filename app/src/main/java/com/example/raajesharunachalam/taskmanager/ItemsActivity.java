@@ -221,60 +221,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
-            case R.id.add_user:
-                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setTitle(R.string.add_user);
-                dialog.setMessage(R.string.add_user_to_group_message);
-                final EditText input = new EditText(ItemsActivity.this);
-                FrameLayout container = new FrameLayout(ItemsActivity.this);
-                FrameLayout.LayoutParams params =
-                        new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.topMargin = 50;
-                params.leftMargin = 100;
-                params.rightMargin = 100;
-                params.bottomMargin = 50;
-                input.setLayoutParams(params);
-                container.addView(input);
-                dialog.setView(container);
-                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String userEmail = input.getText().toString();
-                        AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
-                        Call<Void> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
-                        call.enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                if(response.code()==ResponseCodes.HTTP_CREATED){
-                                    Toast.makeText(ItemsActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
-                                }
-                                else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
-                                    Toast.makeText(ItemsActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
-                                }
-                                else{
-                                    Toast.makeText(ItemsActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                Toast.makeText(ItemsActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
-
-                            }
-                        });
-                        dialog.dismiss();
-                    }
-                });
-                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
-                return true;
-            case R.id.view_users:
+            case R.id.users:
                 Intent intent = new Intent(ItemsActivity.this, UsersInGroupActivity.class);
                 intent.putExtra(IntentKeys.GID, gid);
                 startActivity(intent);

@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
+import com.example.raajesharunachalam.taskmanager.responses.UserInfoResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,6 +32,28 @@ public class EditAccountInfo extends AppCompatActivity {
                updateInfo();
             }
         });
+        Call<UserInfoResponse> call = UserEndpoints.userEndpoints.getUserInfo(uid);
+        call.enqueue(new Callback<UserInfoResponse>() {
+            @Override
+            public void onResponse(Call<UserInfoResponse> call, Response<UserInfoResponse> response) {
+                if(response.code()==ResponseCodes.HTTP_OK){
+                    String oldFirstName = response.body().getFirstName();
+                    String oldLastName = response.body().getLastName();
+                    String oldEmail = response.body().getEmail();
+                    EditText firstNameEdit = (EditText) findViewById(R.id.first_name);
+                    EditText lastNameEdit = (EditText) findViewById(R.id.last_name);
+                    EditText emailEdit = (EditText) findViewById(R.id.emailfield);
+                    firstNameEdit.setText(oldFirstName);
+                    lastNameEdit.setText(oldLastName);
+                    emailEdit.setText(oldEmail);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserInfoResponse> call, Throwable t) {
+
+            }
+        });
     }
 
     public void updateInfo(){
@@ -44,21 +67,9 @@ public class EditAccountInfo extends AppCompatActivity {
         String password = passwordEdit.getText().toString();
 
         UpdateUserRequest request = new UpdateUserRequest();
-        if(firstName.length() == 0){
-            request.setFirstName(null);
-        }else{
-            request.setFirstName(firstName);
-        }
-        if(lastName.length() == 0){
-            request.setLastName(null);
-        }else{
-            request.setLastName(lastName);
-        }
-        if(email.length() == 0){
-            request.setEmail(null);
-        }else{
-            request.setEmail(email);
-        }
+        request.setFirstName(firstName);
+        request.setLastName(lastName);
+        request.setEmail(email);
         if(password.length() == 0){
             request.setPassword(null);
         }else{

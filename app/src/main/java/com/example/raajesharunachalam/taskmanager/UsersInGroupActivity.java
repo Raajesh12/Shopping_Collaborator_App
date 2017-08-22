@@ -1,6 +1,9 @@
 package com.example.raajesharunachalam.taskmanager;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,10 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
+import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.responses.User;
 import com.example.raajesharunachalam.taskmanager.responses.UsersInGroupResponse;
 
@@ -26,6 +32,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
     private static long gid;
     private RecyclerView rv;
     private UsersAdapter adapter;
+    FloatingActionButton addUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +41,64 @@ public class UsersInGroupActivity extends AppCompatActivity {
         gid = getIntent().getLongExtra(IntentKeys.GID,0L);
         rv = (RecyclerView) findViewById(R.id.recycle_group_users);
         initializeRecycler(gid);
+
+        addUsers = (FloatingActionButton) findViewById(R.id.add_users_button);
+        addUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(UsersInGroupActivity.this);
+                dialog.setTitle(R.string.add_user);
+                dialog.setMessage(R.string.add_user_to_group_message);
+                final EditText input = new EditText(UsersInGroupActivity.this);
+                FrameLayout container = new FrameLayout(UsersInGroupActivity.this);
+                FrameLayout.LayoutParams params =
+                        new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.topMargin = 50;
+                params.leftMargin = 100;
+                params.rightMargin = 100;
+                params.bottomMargin = 50;
+                input.setLayoutParams(params);
+                container.addView(input);
+                dialog.setView(container);
+                dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String userEmail = input.getText().toString();
+                        AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
+                        Call<Void> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code()==ResponseCodes.HTTP_CREATED){
+                                    Toast.makeText(UsersInGroupActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                }
+                                else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
+                                    Toast.makeText(UsersInGroupActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
+                                }
+                                else{
+                                    Toast.makeText(UsersInGroupActivity.this, R.string.server_error,Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(UsersInGroupActivity.this, R.string.call_failed,Toast.LENGTH_LONG).show();
+
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+                dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+            }
+        });
     }
 
     public void initializeRecycler(final long gid){
