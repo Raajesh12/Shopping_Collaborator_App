@@ -45,6 +45,7 @@
     <string name="confirm_credentials_for_edit">Please confirm your email and password to edit your account details.</string>
     <string name="confirm_credentials_for_delete">Please confirm your email and password to permanently delete your account.</string>
     <string name="account_deleted">Account deleted.</string>
+    <string name="welcome_message">Welcome To Shopping Collaborator. Start A Shopping Group And List By Signing In Below!</string>
     <string name="email_invalid">Email Invalid</string>
     <string name="edit_info">Edit Item Info</string>
     <string name="item_updated">Item has been updated.</string>

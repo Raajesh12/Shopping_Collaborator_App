@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_background"
     tools:context="com.example.raajesharunachalam.taskmanager.SignUpPage">
 
     <EditText
@@ -14,12 +15,12 @@
         android:inputType="textPersonName"
         android:maxLength="40"
         android:hint="First Name"
-        android:layout_marginTop="40dp"
+        android:background="#A5D6A7"
+        android:layout_marginTop="20dp"
+        android:padding="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="83dp"
-        tools:layout_editor_absoluteY="45dp" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/last_name"
@@ -29,12 +30,12 @@
         android:inputType="textPersonName"
         android:maxLength="40"
         android:hint="Last Name"
+        android:background="#A5D6A7"
         android:layout_marginTop="40dp"
+        android:padding="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/first_name"
-        tools:layout_editor_absoluteX="92dp"
-        tools:layout_editor_absoluteY="138dp" />
+        app:layout_constraintTop_toBottomOf="@id/first_name" />
 
     <EditText
         android:id="@+id/emailfield"
@@ -43,13 +44,13 @@
         android:ems="10"
         android:maxLength="40"
         android:inputType="textEmailAddress"
-        android:hint="email"
+        android:hint="Email"
+        android:background="#A5D6A7"
         android:layout_marginTop="40dp"
+        android:padding="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/last_name"
-        tools:layout_editor_absoluteX="83dp"
-        tools:layout_editor_absoluteY="248dp" />
+        app:layout_constraintTop_toBottomOf="@id/last_name" />
 
     <EditText
         android:id="@+id/passwordfield"
@@ -58,23 +59,34 @@
         android:ems="10"
         android:inputType="textPassword"
         android:maxLength="25"
-        android:hint="password"
+        android:hint="Password"
+        android:background="#A5D6A7"
         android:layout_marginTop="40dp"
+        android:padding="5dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailfield"
-        tools:layout_editor_absoluteX="92dp"
-        tools:layout_editor_absoluteY="357dp" />
+        app:layout_constraintTop_toBottomOf="@id/emailfield" />
 
     <Button
         android:id="@+id/sumbit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sumbit"
-        android:layout_marginTop="40dp"
+        android:textColor="#000080"
+        android:background="#4CAF50"
+        android:layout_marginTop="35dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/passwordfield"
-        tools:layout_editor_absoluteX="147dp"
-        tools:layout_editor_absoluteY="356dp" />
+        app:layout_constraintTop_toBottomOf="@id/passwordfield" />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/settings_image"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sumbit_button"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
