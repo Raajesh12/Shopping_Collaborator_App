@@ -2,6 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="#BDBDBD"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -16,7 +17,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="80dp"
-        tools:text="Vishnu Jaganathan"/>
+        tools:text="Vishnu Jaganathan"
+        tools:textColor="#000080"/>
 
     <Button
         android:id="@+id/cancel_button"
