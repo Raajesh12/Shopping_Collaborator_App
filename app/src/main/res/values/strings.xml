@@ -47,4 +47,5 @@
     <string name="account_deleted">Account deleted.</string>
     <string name="email_invalid">Email Invalid</string>
     <string name="edit_info">Edit Item Info</string>
+    <string name="item_updated">Item has been updated.</string>
 </resources>

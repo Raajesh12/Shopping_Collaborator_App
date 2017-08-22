@@ -384,7 +384,6 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 final int position = holder.getAdapterPosition();
                 final String itemName = holder.itemName.getText().toString();
                 final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
-                final boolean done = true;
 
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
                 alertDialog.setTitle(R.string.edit_info);
@@ -394,6 +393,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 container.setOrientation(LinearLayout.VERTICAL);
 
                 final EditText itemInput = new EditText(ItemsActivity.this);
+                itemInput.setText(itemName);
                 itemInput.setHint(R.string.item_input_hint);
                 LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 itemParams.topMargin = 0;
@@ -403,6 +403,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 itemInput.setLayoutParams(itemParams);
 
                 final EditText estimateInput = new EditText(ItemsActivity.this);
+                estimateInput.setText(estimate + "");
                 estimateInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
                 estimateInput.setHint(R.string.estimate_input_hint);
                 LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -419,21 +420,18 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String actualInput = actualPriceInput.getText().toString();
-                        if(actualInput.length() == 0){
-                            Toast.makeText(ItemsActivity.this, R.string.item_delete_error_message, Toast.LENGTH_LONG).show();
-                            return;
-                        }
-                        double actual = Double.parseDouble(actualInput);
-                        int actualInt = (int) (actual * 100);
-                        actual =  actualInt/100.0;
-                        UpdateItemRequest request = new UpdateItemRequest(itemName, estimate, actual, done);
+                        String newestimate = estimateInput.getText().toString();
+                        String newname = itemInput.getText().toString();
+                        double newestimate1 = Double.parseDouble(newestimate);
+                        int estimateInt = (int) (newestimate1 * 100);
+                        double estimateFinished = estimateInt/100.0;
+                        UpdateItemRequest request = new UpdateItemRequest(newname, estimateFinished, 0.0, false);
                         Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.updateItem(gid, request);
                         call.enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
-                                    Toast.makeText(ItemsActivity.this, R.string.item_mark_done, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(ItemsActivity.this, R.string.item_updated, Toast.LENGTH_LONG).show();
                                 } else{
                                     Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                 }
