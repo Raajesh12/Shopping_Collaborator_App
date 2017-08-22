@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BDBDBD"
+    android:background="@color/gray_background"
     tools:context="com.example.raajesharunachalam.taskmanager.ItemsActivity">
 
     <TextView
@@ -98,10 +98,6 @@
         android:layout_marginStart="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginEnd="20dp" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_items_button"

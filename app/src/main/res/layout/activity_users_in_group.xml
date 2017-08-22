@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BDBDBD"
+    android:background="@color/gray_background"
     tools:context="com.example.raajesharunachalam.taskmanager.UsersInGroupActivity">
 
     <android.support.v7.widget.RecyclerView
@@ -20,8 +20,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
         android:textColor="#000080"
-        android:background="#EEEEEE"
-        android:padding="10dp">
+        android:padding="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp">
     </android.support.v7.widget.RecyclerView>
