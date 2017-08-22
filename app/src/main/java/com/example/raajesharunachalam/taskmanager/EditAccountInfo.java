@@ -19,6 +19,10 @@ import retrofit2.Response;
 public class EditAccountInfo extends AppCompatActivity {
 
     static long uid;
+    static String oldFirstName;
+    static String oldLastName;
+    static String oldEmail;
+    static String oldPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +41,18 @@ public class EditAccountInfo extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserInfoResponse> call, Response<UserInfoResponse> response) {
                 if(response.code()==ResponseCodes.HTTP_OK){
-                    String oldFirstName = response.body().getFirstName();
-                    String oldLastName = response.body().getLastName();
-                    String oldEmail = response.body().getEmail();
+                    oldFirstName = response.body().getFirstName();
+                    oldLastName = response.body().getLastName();
+                    oldEmail = response.body().getEmail();
+                    oldPassword = response.body().getPassword();
                     EditText firstNameEdit = (EditText) findViewById(R.id.first_name);
                     EditText lastNameEdit = (EditText) findViewById(R.id.last_name);
                     EditText emailEdit = (EditText) findViewById(R.id.emailfield);
+                    EditText passwordEdit = (EditText) findViewById(R.id.passwordfield);
                     firstNameEdit.setText(oldFirstName);
                     lastNameEdit.setText(oldLastName);
                     emailEdit.setText(oldEmail);
+                    passwordEdit.setText(oldPassword);
                 }
             }
 
@@ -65,33 +72,36 @@ public class EditAccountInfo extends AppCompatActivity {
         String email = emailEdit.getText().toString();
         EditText passwordEdit = (EditText) findViewById(R.id.passwordfield);
         String password = passwordEdit.getText().toString();
+        if(!oldFirstName.equals(firstName) || !oldLastName.equals(lastName) || !oldEmail.equals(email) ||
+                !oldPassword.equals(password)) {
 
-        UpdateUserRequest request = new UpdateUserRequest();
-        request.setFirstName(firstName);
-        request.setLastName(lastName);
-        request.setEmail(email);
-        if(password.length() == 0){
-            request.setPassword(null);
-        }else{
+
+            UpdateUserRequest request = new UpdateUserRequest();
+            request.setFirstName(firstName);
+            request.setLastName(lastName);
+            request.setEmail(email);
             request.setPassword(password);
-        }
 
-        Call<Void> call = UserEndpoints.userEndpoints.updateUser(uid, request);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
-                    Toast.makeText(EditAccountInfo.this, R.string.account_updated,Toast.LENGTH_LONG).show();
-                    EditAccountInfo.this.finish();
-                }else{
-                    Toast.makeText(EditAccountInfo.this, R.string.email_not_unique,Toast.LENGTH_LONG).show();
+            Call<Void> call = UserEndpoints.userEndpoints.updateUser(uid, request);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.code() == ResponseCodes.HTTP_NO_CONTENT) {
+                        Toast.makeText(EditAccountInfo.this, R.string.account_updated, Toast.LENGTH_LONG).show();
+                        EditAccountInfo.this.finish();
+                    } else {
+                        Toast.makeText(EditAccountInfo.this, R.string.email_not_unique, Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(EditAccountInfo.this, R.string.call_failed, Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Toast.makeText(EditAccountInfo.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+        else{
+            Toast.makeText(EditAccountInfo.this, R.string.no_fields_changed, Toast.LENGTH_LONG).show();
+        }
     }
 }
