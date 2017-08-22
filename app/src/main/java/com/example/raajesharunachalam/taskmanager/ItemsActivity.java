@@ -371,6 +371,97 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     }
 
     public void initializeItemTouchHelper(){
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                final Long gid = (Long) viewHolder.itemView.getTag();
+                ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                final int position = holder.getAdapterPosition();
+                final String itemName = holder.itemName.getText().toString();
+                final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
+                final boolean done = true;
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
+                alertDialog.setTitle(R.string.edit_info);
+
+                LinearLayout container = new LinearLayout(ItemsActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText itemInput = new EditText(ItemsActivity.this);
+                itemInput.setHint(R.string.item_input_hint);
+                LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                itemParams.topMargin = 0;
+                itemParams.leftMargin = 100;
+                itemParams.rightMargin = 100;
+                itemParams.bottomMargin = 0;
+                itemInput.setLayoutParams(itemParams);
+
+                final EditText estimateInput = new EditText(ItemsActivity.this);
+                estimateInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                estimateInput.setHint(R.string.estimate_input_hint);
+                LinearLayout.LayoutParams estimateParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                estimateParams.topMargin = 50;
+                estimateParams.leftMargin = 100;
+                estimateParams.rightMargin = 100;
+                estimateParams.bottomMargin = 50;
+                estimateInput.setLayoutParams(estimateParams);
+
+                container.addView(itemInput);
+                container.addView(estimateInput);
+                alertDialog.setView(container);
+
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String actualInput = actualPriceInput.getText().toString();
+                        if(actualInput.length() == 0){
+                            Toast.makeText(ItemsActivity.this, R.string.item_delete_error_message, Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        double actual = Double.parseDouble(actualInput);
+                        int actualInt = (int) (actual * 100);
+                        actual =  actualInt/100.0;
+                        UpdateItemRequest request = new UpdateItemRequest(itemName, estimate, actual, done);
+                        Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.updateItem(gid, request);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(ItemsActivity.this, R.string.item_mark_done, Toast.LENGTH_LONG).show();
+                                } else{
+                                    Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
+                                sharedPreferences.edit().putBoolean(REFRESH_KEY, true).apply();
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        refreshScreen(gid, false);
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.show();
+            }
+        }).attachToRecyclerView(rv);
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
