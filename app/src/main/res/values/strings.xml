@@ -55,4 +55,5 @@
     <string name="update_group_hint">Enter A Group Name</string>
     <string name="delete_items">Delete Items</string>
     <string name="delete_items_success_message">The items have been deleted successfully</string>
+    <string name="delete_items_none">No Items Were Selected To Delete</string>
 </resources>

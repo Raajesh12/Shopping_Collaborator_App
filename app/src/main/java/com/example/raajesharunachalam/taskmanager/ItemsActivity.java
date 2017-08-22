@@ -61,6 +61,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     TextView itemsBought;
     TextView totalCost;
     Button deleteItems;
+    FloatingActionButton addItem;
     HashSet<Long> itemsToDelete;
 
     @Override
@@ -86,10 +87,13 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
-        FloatingActionButton button = (FloatingActionButton) findViewById(R.id.add_items_button);
-        button.setOnClickListener(new View.OnClickListener() {
+        addItem = (FloatingActionButton) findViewById(R.id.add_items_button);
+        addItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(addItem.getVisibility() != View.VISIBLE){
+                    return;
+                }
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(ItemsActivity.this);
                 alertDialog.setTitle(R.string.add_items_title);
                 alertDialog.setMessage(R.string.add_items_message);
@@ -170,6 +174,10 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             @Override
             public void onClick(View v) {
                 if(deleteItems.getVisibility() ==  View.VISIBLE) {
+                    if(itemsToDelete.size() == 0){
+                        Toast.makeText(ItemsActivity.this, R.string.delete_items_none, Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     long[] itemIds = new long[itemsToDelete.size()];
                     int counter = 0;
                     for(long itemId : itemsToDelete){
@@ -185,6 +193,8 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                                 deleteMode = false;
                                 adapter.notifyDataSetChanged();
                                 deleteItems.setVisibility(View.GONE);
+                                addItem.setVisibility(View.VISIBLE);
+                                itemsToDelete.clear();
                                 refreshScreen(gid, true);
                             } else {
                                 Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
@@ -354,6 +364,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 deleteMode = true;
                 adapter.notifyDataSetChanged();
                 deleteItems.setVisibility(View.VISIBLE);
+                addItem.setVisibility(View.GONE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -366,6 +377,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             deleteMode = false;
             adapter.notifyDataSetChanged();
             deleteItems.setVisibility(View.GONE);
+            addItem.setVisibility(View.VISIBLE);
         } else {
             super.onBackPressed();
         }
@@ -734,14 +746,19 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
             if(holder instanceof ItemDeleteViewHolder) {
                 final ItemDeleteViewHolder viewHolder = (ItemDeleteViewHolder) holder;
+                viewHolder.shouldDelete.setChecked(false);
                 viewHolder.shouldDelete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         Long itemId = (Long) viewHolder.itemView.getTag();
-                        if(itemsToDelete.contains(itemId)) {
-                            itemsToDelete.remove(itemId);
+                        if(isChecked){
+                            if(!(itemsToDelete.contains(itemId))){
+                                itemsToDelete.add(itemId);
+                            }
                         } else {
-                            itemsToDelete.add(itemId);
+                            if(itemsToDelete.contains(itemId)) {
+                                itemsToDelete.remove(itemId);
+                            }
                         }
                     }
                 });
