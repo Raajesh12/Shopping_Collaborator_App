@@ -21,4 +21,8 @@
     <item android:id="@+id/items_log_out_button"
         android:title="Log Out"
         app:showAsAction="never" />
+
+    <item android:id="@+id/remove_items"
+        android:title="Remove Items"
+        app:showAsAction="never" />
 </menu>

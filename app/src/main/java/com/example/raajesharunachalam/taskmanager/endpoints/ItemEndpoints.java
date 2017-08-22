@@ -36,8 +36,8 @@ public interface ItemEndpoints {
     Call<Void> updateItem(@Path("itemId") long itemId, @Body UpdateItemRequest updateItemRequest);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
-    @DELETE("/items/{itemId}")
-    Call<Void> deleteItem(@Path("itemId") long itemId);
+    @DELETE("/items")
+    Call<Void> deleteItems(@Query("item_id") long[] itemIds);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @DELETE("/items/delete_all")

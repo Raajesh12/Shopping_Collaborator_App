@@ -53,4 +53,6 @@
     <string name="update_group_successful_message">The group name was updated successfully</string>
     <string name="update_group_error">Enter a name for the group to be renamed to</string>
     <string name="update_group_hint">Enter A Group Name</string>
+    <string name="delete_items">Delete Items</string>
+    <string name="delete_items_success_message">The items have been deleted successfully</string>
 </resources>

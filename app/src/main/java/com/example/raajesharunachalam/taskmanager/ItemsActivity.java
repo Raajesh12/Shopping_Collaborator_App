@@ -20,6 +20,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -38,6 +41,9 @@ import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,6 +60,8 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     ItemsAdapter adapter;
     TextView itemsBought;
     TextView totalCost;
+    Button deleteItems;
+    HashSet<Long> itemsToDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +74,11 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         rv = (RecyclerView) findViewById(R.id.recycle_items);
         initializeScreen(gid);
 
+        itemsToDelete = new HashSet<>();
+
         itemsBought = (TextView) findViewById(R.id.tv_items_bought_actual);
         totalCost = (TextView) findViewById(R.id.tv_total_cost_actual);
+        deleteItems = (Button) findViewById(R.id.delete_items_button);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
         Log.d("SharedPreferences", String.valueOf(sharedPreferences.getBoolean(REFRESH_KEY, false)));
@@ -152,6 +163,40 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 });
 
                 alertDialog.show();
+            }
+        });
+
+        deleteItems.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(deleteItems.getVisibility() ==  View.VISIBLE) {
+                    long[] itemIds = new long[itemsToDelete.size()];
+                    int counter = 0;
+                    for(long itemId : itemsToDelete){
+                        itemIds[counter] = itemId;
+                        counter++;
+                    }
+                    Call<Void> call = ItemEndpoints.ITEM_ENDPOINTS.deleteItems(itemIds);
+                    call.enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                Toast.makeText(ItemsActivity.this, R.string.delete_items_success_message, Toast.LENGTH_LONG).show();
+                                deleteMode = false;
+                                adapter.notifyDataSetChanged();
+                                deleteItems.setVisibility(View.GONE);
+                                refreshScreen(gid, true);
+                            } else {
+                                Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+                            Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
             }
         });
     }
@@ -305,10 +350,25 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(homeIntent);
                 return true;
+            case R.id.remove_items:
+                deleteMode = true;
+                adapter.notifyDataSetChanged();
+                deleteItems.setVisibility(View.VISIBLE);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        if(deleteMode){
+            deleteMode = false;
+            adapter.notifyDataSetChanged();
+            deleteItems.setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void initializeScreen(final long gid) {
@@ -383,7 +443,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 final Long gid = (Long) viewHolder.itemView.getTag();
-                ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                ItemViewHolder holder = (ItemViewHolder) viewHolder;
                 final int position = holder.getAdapterPosition();
                 final String itemName = holder.itemName.getText().toString();
                 final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
@@ -476,7 +536,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 final Long gid = (Long) viewHolder.itemView.getTag();
-                ItemsViewHolder holder = (ItemsViewHolder) viewHolder;
+                ItemViewHolder holder = (ItemViewHolder) viewHolder;
                 final int position = holder.getAdapterPosition();
                 final String itemName = holder.itemName.getText().toString();
                 final double estimate = Double.parseDouble(holder.estimate.getText().toString().substring(1));
@@ -620,7 +680,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
     }
 
-    public class ItemsAdapter extends RecyclerView.Adapter<ItemsViewHolder>{
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder>{
 
         Item[] items;
         public ItemsAdapter(Item[] items){
@@ -632,21 +692,23 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
 
         @Override
-        public ItemsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = ItemsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
-            View view;
             if(viewType == NORMAL_ITEM){
-                view = myInflater.inflate(R.layout.item_normal_mode, parent, false);
+                View view = myInflater.inflate(R.layout.item_normal_mode, parent, false);
+                ItemViewHolder viewHolder = new ItemViewHolder(view);
+                return viewHolder;
+            } else {
+                View view = myInflater.inflate(R.layout.item_delete_mode, parent, false);
+                ItemDeleteViewHolder viewHolder = new ItemDeleteViewHolder(view);
+                return viewHolder;
             }
-
-            ItemsViewHolder viewHolder = new ItemsViewHolder(view);
-            return viewHolder;
         }
 
         @Override
-        public void onBindViewHolder(ItemsViewHolder holder, int position) {
+        public void onBindViewHolder(ItemViewHolder holder, int position) {
             Item item = items[position];
             if(item.getItemName() != null) {
                 holder.itemName.setText(item.getItemName());
@@ -669,6 +731,21 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 Long itemId = new Long(item.getItemId());
                 holder.itemView.setTag(itemId);
             }
+
+            if(holder instanceof ItemDeleteViewHolder) {
+                final ItemDeleteViewHolder viewHolder = (ItemDeleteViewHolder) holder;
+                viewHolder.shouldDelete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        Long itemId = (Long) viewHolder.itemView.getTag();
+                        if(itemsToDelete.contains(itemId)) {
+                            itemsToDelete.remove(itemId);
+                        } else {
+                            itemsToDelete.add(itemId);
+                        }
+                    }
+                });
+            }
         }
 
         @Override
@@ -686,15 +763,23 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
     }
 
-    public class ItemsViewHolder extends RecyclerView.ViewHolder{
+    public class ItemViewHolder extends RecyclerView.ViewHolder{
         public TextView itemName;
         public TextView itemAuthor;
         public TextView estimate;
-        public ItemsViewHolder(View itemView) {
+        public ItemViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView) itemView.findViewById(R.id.item_description);
             itemAuthor = (TextView) itemView.findViewById(R.id.item_author);
             estimate = (TextView) itemView.findViewById(R.id.item_estimate);
+        }
+    }
+
+    public class ItemDeleteViewHolder extends ItemViewHolder {
+        public CheckBox shouldDelete;
+        public ItemDeleteViewHolder(View itemView) {
+            super(itemView);
+            shouldDelete = (CheckBox) itemView.findViewById(R.id.should_delete);
         }
     }
 }
