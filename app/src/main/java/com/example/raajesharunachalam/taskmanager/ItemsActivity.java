@@ -296,7 +296,12 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                     }
                 });
                 dialog2.show();
-
+                return true;
+            case R.id.items_log_out_button:
+                Intent homeIntent = new Intent(ItemsActivity.this, MainActivity.class);
+                homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(homeIntent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

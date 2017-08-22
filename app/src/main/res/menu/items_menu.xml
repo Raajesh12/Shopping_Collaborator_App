@@ -17,4 +17,8 @@
     <item android:id="@+id/delete_group"
         android:title="Delete Group"
         app:showAsAction="never"/>
+
+    <item android:id="@+id/items_log_out_button"
+        android:title="Log Out"
+        app:showAsAction="never" />
 </menu>

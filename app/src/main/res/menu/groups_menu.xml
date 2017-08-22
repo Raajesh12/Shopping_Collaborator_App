@@ -10,4 +10,8 @@
         android:title="Delete Account"
         app:showAsAction="never"/>
 
+    <item android:id="@+id/groups_log_out_button"
+        android:title="Log Out"
+        app:showAsAction="never" />
+
 </menu>

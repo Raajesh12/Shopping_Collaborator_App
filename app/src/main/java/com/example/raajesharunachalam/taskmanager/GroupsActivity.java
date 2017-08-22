@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +43,7 @@ import retrofit2.Response;
 
 public class GroupsActivity extends AppCompatActivity {
     private static long uid;
+    private static int startCalls;
     private RecyclerView rv;
     private GroupsAdapter groupsAdapter;
     private FloatingActionButton addGroupButton;
@@ -210,7 +212,9 @@ public class GroupsActivity extends AppCompatActivity {
                                         public void onResponse(Call<Void> call, Response<Void> response) {
                                             if(response.code()==ResponseCodes.HTTP_NO_CONTENT){
                                                 Toast.makeText(GroupsActivity.this, R.string.account_deleted, Toast.LENGTH_LONG).show();
-                                                GroupsActivity.this.finish();
+                                                Intent intent = new Intent(GroupsActivity.this, MainActivity.class);
+                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                startActivity(intent);
                                             }else{
                                                 Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                                             }
@@ -245,6 +249,7 @@ public class GroupsActivity extends AppCompatActivity {
                 });
                 dialog.show();
                 return true;
+
             case R.id.edit_account_info:
                 AlertDialog.Builder dialog1 = new AlertDialog.Builder(GroupsActivity.this);
                 dialog1.setTitle(R.string.confirm_credentials_title);
@@ -315,6 +320,11 @@ public class GroupsActivity extends AppCompatActivity {
                 });
                 dialog1.show();
                 return true;
+            case R.id.groups_log_out_button:
+                Intent intent = new Intent(GroupsActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -323,7 +333,16 @@ public class GroupsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        refreshRecyclerView(uid);
+        startCalls++;
+        if(startCalls > 1) {
+            refreshRecyclerView(uid);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        startCalls = 0;
     }
 
     public void initializeRecyclerView(final long uid) {
