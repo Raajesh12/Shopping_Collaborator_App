@@ -11,7 +11,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,15 +27,13 @@ import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.CreateGroupRequest;
+import com.example.raajesharunachalam.taskmanager.requests.UpdateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.UIDResponse;
 
-import java.io.IOException;
-
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -67,7 +64,7 @@ public class GroupsActivity extends AppCompatActivity {
                 return false;
             }
 
-            // Called when a user swipes left or right on a ViewHolder
+            // Called when a user swipes left or right on a GroupViewHolder
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 Long gid = (Long) viewHolder.itemView.getTag();
@@ -92,6 +89,81 @@ public class GroupsActivity extends AppCompatActivity {
                         refreshRecyclerView(uid);
                     }
                 });
+            }
+        }).attachToRecyclerView(rv);
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                final Long gid = (Long) viewHolder.itemView.getTag();
+                GroupViewHolder holder = (GroupViewHolder) viewHolder;
+
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(GroupsActivity.this);
+                alertDialog.setTitle(R.string.update_group_title);
+                alertDialog.setMessage(R.string.update_group_message);
+
+                LinearLayout container = new LinearLayout(GroupsActivity.this);
+                container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                container.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText groupNameInput = new EditText(GroupsActivity.this);
+                groupNameInput.setText(holder.groupName.getText().toString());
+                groupNameInput.setHint(R.string.update_group_hint);
+                LinearLayout.LayoutParams itemParams = new  LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                itemParams.topMargin = 0;
+                itemParams.leftMargin = 100;
+                itemParams.rightMargin = 100;
+                itemParams.bottomMargin = 0;
+                groupNameInput.setLayoutParams(itemParams);
+
+                container.addView(groupNameInput);
+                alertDialog.setView(container);
+
+                alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String groupName = groupNameInput.getText().toString();
+                        if(groupName.length() == 0){
+                            Toast.makeText(GroupsActivity.this, R.string.update_group_error, Toast.LENGTH_LONG).show();
+                            refreshRecyclerView(uid);
+                            return;
+                        }
+                        UpdateGroupRequest request = new UpdateGroupRequest(groupName);
+                        Call<Void> call = GroupEndpoints.groupEndpoints.updateGroup(gid, request);
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if(response.code() == ResponseCodes.HTTP_NO_CONTENT){
+                                    Toast.makeText(GroupsActivity.this, R.string.update_group_successful_message, Toast.LENGTH_LONG).show();
+                                } else{
+                                    Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
+                                }
+                                refreshRecyclerView(uid);
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(GroupsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
+                                refreshRecyclerView(uid);
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+
+                alertDialog.setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        refreshRecyclerView(uid);
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.show();
             }
         }).attachToRecyclerView(rv);
 
@@ -392,7 +464,7 @@ public class GroupsActivity extends AppCompatActivity {
         });
     }
 
-    public class GroupsAdapter extends RecyclerView.Adapter<GroupsAdapter.ViewHolder> {
+    public class GroupsAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
         Group[] groups;
 
@@ -406,28 +478,28 @@ public class GroupsActivity extends AppCompatActivity {
         }
 
         @Override
-        public GroupsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public GroupViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             Context context = GroupsActivity.this;
             LayoutInflater myInflater = LayoutInflater.from(context);
 
             View groupView = myInflater.inflate(R.layout.group_item, parent, false);
 
-            ViewHolder viewHolder = new ViewHolder(groupView);
-            return viewHolder;
+            GroupViewHolder groupViewHolder = new GroupViewHolder(groupView);
+            return groupViewHolder;
         }
 
         @Override
-        public void onBindViewHolder(final GroupsAdapter.ViewHolder viewHolder, int position) {
+        public void onBindViewHolder(final GroupViewHolder groupViewHolder, int position) {
             Group aGroup = groups[position];
-            viewHolder.groupName.setText(aGroup.getGroupName());
+            groupViewHolder.groupName.setText(aGroup.getGroupName());
             Long longer = new Long(aGroup.getGroupId());
-            viewHolder.itemView.setTag(longer);
+            groupViewHolder.itemView.setTag(longer);
 
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            groupViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(GroupsActivity.this, ItemsActivity.class);
-                    Long longer = (Long) viewHolder.itemView.getTag();
+                    Long longer = (Long) groupViewHolder.itemView.getTag();
 
                     long groupId = longer.longValue();
                     intent.putExtra(IntentKeys.GID, groupId);
@@ -442,15 +514,15 @@ public class GroupsActivity extends AppCompatActivity {
         public int getItemCount() {
             return groups.length;
         }
+    }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            public TextView groupName;
+    public class GroupViewHolder extends RecyclerView.ViewHolder {
+        public TextView groupName;
 
-            public ViewHolder(View itemView) {
-                super(itemView);
+        public GroupViewHolder(View itemView) {
+            super(itemView);
 
-                groupName = (TextView) itemView.findViewById(R.id.group_name);
-            }
+            groupName = (TextView) itemView.findViewById(R.id.group_name);
         }
     }
 }

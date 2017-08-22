@@ -48,4 +48,9 @@
     <string name="email_invalid">Email Invalid</string>
     <string name="edit_info">Edit Item Info</string>
     <string name="item_updated">Item has been updated.</string>
+    <string name="update_group_title">Group Update</string>
+    <string name="update_group_message">Enter the updated group name below:</string>
+    <string name="update_group_successful_message">The group name was updated successfully</string>
+    <string name="update_group_error">Enter a name for the group to be renamed to</string>
+    <string name="update_group_hint">Enter A Group Name</string>
 </resources>
