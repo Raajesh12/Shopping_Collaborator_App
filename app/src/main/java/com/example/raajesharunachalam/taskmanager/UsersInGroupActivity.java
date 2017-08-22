@@ -22,6 +22,8 @@ import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.responses.User;
 import com.example.raajesharunachalam.taskmanager.responses.UsersInGroupResponse;
 
+import java.util.HashSet;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,6 +35,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
     private RecyclerView rv;
     private UsersAdapter adapter;
     FloatingActionButton addUsers;
+    HashSet<String> emailsInGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +56,9 @@ public class UsersInGroupActivity extends AppCompatActivity {
                 FrameLayout container = new FrameLayout(UsersInGroupActivity.this);
                 FrameLayout.LayoutParams params =
                         new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.topMargin = 50;
                 params.leftMargin = 100;
                 params.rightMargin = 100;
-                params.bottomMargin = 50;
+                params.bottomMargin = 75;
                 input.setLayoutParams(params);
                 container.addView(input);
                 dialog.setView(container);
@@ -64,6 +66,11 @@ public class UsersInGroupActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         final String userEmail = input.getText().toString();
+                        if(emailsInGroup.contains(userEmail)){
+                            Toast.makeText(UsersInGroupActivity.this, R.string.add_user_already_in_group, Toast.LENGTH_LONG).show();
+                            dialog.dismiss();
+                            return;
+                        }
                         AddUserGroupRequest req = new AddUserGroupRequest(gid, userEmail);
                         Call<Void> call = GroupUserEndpoints.groupUserEndpoints.addUserToGroup(req);
                         call.enqueue(new Callback<Void>() {
@@ -71,6 +78,7 @@ public class UsersInGroupActivity extends AppCompatActivity {
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if(response.code()==ResponseCodes.HTTP_CREATED){
                                     Toast.makeText(UsersInGroupActivity.this,"User at " + userEmail + " added.", Toast.LENGTH_LONG).show();
+                                    resetRecyclerView(gid);
                                 }
                                 else if (response.code()==ResponseCodes.HTTP_BAD_REQUEST){
                                     Toast.makeText(UsersInGroupActivity.this, R.string.user_not_found,Toast.LENGTH_LONG).show();
@@ -111,6 +119,10 @@ public class UsersInGroupActivity extends AppCompatActivity {
                     LinearLayoutManager layoutManager = new LinearLayoutManager(UsersInGroupActivity.this);
                     rv.setLayoutManager(layoutManager);
                     User[] users = response.body().getUsers();
+                    emailsInGroup = new HashSet<String>();
+                    for(User user : users){
+                        emailsInGroup.add(user.getEmail());
+                    }
                     adapter = new UsersAdapter(users);
                     rv.setAdapter(adapter);
                 }
@@ -135,6 +147,10 @@ public class UsersInGroupActivity extends AppCompatActivity {
                 if(response.code()==ResponseCodes.HTTP_OK){
                     User[] users = response.body().getUsers();
                     adapter.setUsers(users);
+                    emailsInGroup.clear();
+                    for(User user : users){
+                        emailsInGroup.add(user.getEmail());
+                    }
                     adapter.notifyDataSetChanged();
                 }
                 else{
