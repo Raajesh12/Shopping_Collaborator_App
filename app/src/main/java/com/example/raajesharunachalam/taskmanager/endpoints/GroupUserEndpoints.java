@@ -31,7 +31,7 @@ public interface GroupUserEndpoints {
     Call<Void> deleteUserFromGroup(@Query("gid") long gid, @Query("uid") long uid);
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://taskmanager.host")
+            .baseUrl("http://api.taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

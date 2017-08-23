@@ -51,7 +51,7 @@ public interface GroupEndpoints {
 
 
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://taskmanager.host")
+            .baseUrl("http://api.taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
