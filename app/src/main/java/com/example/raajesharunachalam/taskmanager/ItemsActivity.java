@@ -656,7 +656,13 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
     }
 
-    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder>{
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
         Item[] items;
         public ItemsAdapter(Item[] items){
@@ -772,11 +778,12 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             boolean shouldRefresh = intent.getBooleanExtra(IntentKeys.SHOULD_REFRESH, false);
             if(shouldRefresh) {
                 ItemsActivity.this.refreshScreen(gid, true);
             }
-            Intent checkRefresh = new Intent(ItemsActivity.this, GroupService.class);
+            Intent checkRefresh = new Intent(ItemsActivity.this, ItemService.class);
             checkRefresh.putExtra(IntentKeys.GID, gid);
             checkRefresh.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
             startService(checkRefresh);

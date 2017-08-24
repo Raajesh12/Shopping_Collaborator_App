@@ -64,11 +64,6 @@ public class GroupsActivity extends AppCompatActivity {
         rv = (RecyclerView) findViewById(R.id.recycleGroups);
         addGroupButton = (FloatingActionButton) findViewById(R.id.add_group_button);
 
-        IntentFilter filter = new IntentFilter(GroupResponseReceiver.ACTION_RESP);
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        receiver = new GroupResponseReceiver();
-        registerReceiver(receiver, filter);
-
         initializeRecyclerView(uid);
 
         // Allows the user to delete a group by swiping left on the given row
@@ -237,7 +232,6 @@ public class GroupsActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -421,10 +415,16 @@ public class GroupsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter filter = new IntentFilter(GroupResponseReceiver.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new GroupResponseReceiver();
+        registerReceiver(receiver, filter);
+
         startCalls++;
         if (startCalls > 1) {
             refreshRecyclerView(uid);
         }
+
     }
 
     @Override

@@ -23,7 +23,7 @@ import retrofit2.Response;
 
 public class ItemService extends IntentService {
 
-    public static final int MAX = 20;
+    public static final int MAX_ITERATIONS = 10;
     int count = 0;
     public ItemService() {
         super("Item Service");
@@ -35,33 +35,36 @@ public class ItemService extends IntentService {
         long gid = intent.getLongExtra(IntentKeys.GID, 0L);
         Calendar lastRefreshed = (Calendar) intent.getSerializableExtra(IntentKeys.LAST_REFRESHED);
         while(notRecentlyUpdated) {
-            Log.d("GroupService", "New Iteration Of Loop");
+            Log.d("ItemService", "New Iteration Of Loop");
             Call<LastModifiedResponse> call = GroupEndpoints.groupEndpoints.getGroupLastModified(gid);
             try {
                 Response<LastModifiedResponse> response = call.execute();
-                LastModifiedResponse responseJson = response.body();
-                int year = responseJson.getYear();
-                int month = responseJson.getMonth() - 1;
-                int day = responseJson.getDay();
-                int hour = responseJson.getHour();
-                int minute = responseJson.getMinute();
-                int second = responseJson.getSecond();
+                if(response.code() == ResponseCodes.HTTP_OK) {
+                    LastModifiedResponse responseJson = response.body();
+                    int year = responseJson.getYear();
+                    int month = responseJson.getMonth() - 1;
+                    int day = responseJson.getDay();
+                    int hour = responseJson.getHour();
+                    int minute = responseJson.getMinute();
+                    int second = responseJson.getSecond();
 
-                Calendar lastModified = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                lastModified.set(year, month, day, hour, minute, second);
+                    Calendar lastModified = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    lastModified.set(year, month, day, hour, minute, second);
 
-                if(lastModified.after(lastRefreshed)) {
-                    notRecentlyUpdated = false;
-                    Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
-                    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-                    sendBroadcast(broadcastIntent);
+                    if (lastModified.after(lastRefreshed)) {
+                        notRecentlyUpdated = false;
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction(ItemsActivity.ItemResponseReceiver.ACTION_RESP);
+                        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                        broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, true);
+                        sendBroadcast(broadcastIntent);
+                    }
                 }
             } catch (IOException e){}
             count++;
-            if(count > MAX){
+            if(count >= MAX_ITERATIONS){
                 Intent broadcastIntent = new Intent();
-                broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
+                broadcastIntent.setAction(ItemsActivity.ItemResponseReceiver.ACTION_RESP);
                 broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
                 broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, false);
                 sendBroadcast(broadcastIntent);

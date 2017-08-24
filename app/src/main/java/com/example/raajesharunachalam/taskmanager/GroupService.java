@@ -23,7 +23,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class GroupService extends IntentService {
-    private static final int MAX_ITERATIONS = 20;
+    private static final int MAX_ITERATIONS = 10;
 
     public GroupService() {
         super("GroupService");
@@ -40,28 +40,30 @@ public class GroupService extends IntentService {
             Call<LastModifiedResponse> call = UserEndpoints.userEndpoints.getUserLastModified(uid);
             try {
                 Response<LastModifiedResponse> response = call.execute();
-                LastModifiedResponse responseJson = response.body();
-                int year = responseJson.getYear();
-                int month = responseJson.getMonth() - 1;
-                int day = responseJson.getDay();
-                int hour = responseJson.getHour();
-                int minute = responseJson.getMinute();
-                int second = responseJson.getSecond();
+                if(response.code() == ResponseCodes.HTTP_OK) {
+                    LastModifiedResponse responseJson = response.body();
+                    int year = responseJson.getYear();
+                    int month = responseJson.getMonth() - 1;
+                    int day = responseJson.getDay();
+                    int hour = responseJson.getHour();
+                    int minute = responseJson.getMinute();
+                    int second = responseJson.getSecond();
 
-                Calendar lastModified = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-                lastModified.set(year, month, day, hour, minute, second);
-                if(lastModified.after(lastRefreshed)) {
-                    notRecentlyUpdated = false;
-                    Intent broadcastIntent = new Intent();
-                    broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
-                    broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, true);
-                    broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-                    sendBroadcast(broadcastIntent);
+                    Calendar lastModified = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    lastModified.set(year, month, day, hour, minute, second);
+                    if (lastModified.after(lastRefreshed)) {
+                        notRecentlyUpdated = false;
+                        Intent broadcastIntent = new Intent();
+                        broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
+                        broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, true);
+                        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                        sendBroadcast(broadcastIntent);
+                    }
                 }
             } catch (IOException e){}
 
             count++;
-            if(count > MAX_ITERATIONS) {
+            if(count >= MAX_ITERATIONS) {
                 Intent broadcastIntent = new Intent();
                 broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
                 broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
