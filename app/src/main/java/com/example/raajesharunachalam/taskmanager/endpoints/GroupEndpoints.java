@@ -49,7 +49,6 @@ public interface GroupEndpoints {
     @GET("/items_completed")
     Call<ItemsCompletedResponse> getItemsCompleted(@Query("gid") long gid);
 
-
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://api.taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
