@@ -15,6 +15,7 @@ import com.example.raajesharunachalam.taskmanager.responses.LastModifiedResponse
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -22,6 +23,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class GroupService extends IntentService {
+    private static final int MAX_ITERATIONS = 20;
 
     public GroupService() {
         super("GroupService");
@@ -32,6 +34,7 @@ public class GroupService extends IntentService {
         boolean notRecentlyUpdated = true;
         long uid = intent.getLongExtra(IntentKeys.UID, 0L);
         Calendar lastRefreshed = (Calendar) intent.getSerializableExtra(IntentKeys.LAST_REFRESHED);
+        int count = 0;
         while(notRecentlyUpdated) {
             Log.d("GroupService", "New Iteration Of Loop");
             Call<LastModifiedResponse> call = UserEndpoints.userEndpoints.getUserLastModified(uid);
@@ -45,17 +48,27 @@ public class GroupService extends IntentService {
                 int minute = responseJson.getMinute();
                 int second = responseJson.getSecond();
 
-                Calendar lastModified = Calendar.getInstance();
+                Calendar lastModified = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
                 lastModified.set(year, month, day, hour, minute, second);
-
                 if(lastModified.after(lastRefreshed)) {
                     notRecentlyUpdated = false;
                     Intent broadcastIntent = new Intent();
                     broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
+                    broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, true);
                     broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
                     sendBroadcast(broadcastIntent);
                 }
             } catch (IOException e){}
+
+            count++;
+            if(count > MAX_ITERATIONS) {
+                Intent broadcastIntent = new Intent();
+                broadcastIntent.setAction(GroupsActivity.GroupResponseReceiver.ACTION_RESP);
+                broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+                broadcastIntent.putExtra(IntentKeys.SHOULD_REFRESH, false);
+                sendBroadcast(broadcastIntent);
+                return;
+            }
 
             try {
                 TimeUnit.SECONDS.sleep(3);

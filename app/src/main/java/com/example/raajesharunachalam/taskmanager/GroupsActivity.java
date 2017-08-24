@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -488,6 +489,12 @@ public class GroupsActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
     public class GroupsAdapter extends RecyclerView.Adapter<GroupViewHolder> {
 
         Group[] groups;
@@ -555,8 +562,11 @@ public class GroupsActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            GroupsActivity.this.refreshRecyclerView(uid);
-
+            Log.d("GroupService", "Broadcast Receiver onReceived()");
+            boolean shouldRefresh = intent.getBooleanExtra(IntentKeys.SHOULD_REFRESH, false);
+            if(shouldRefresh) {
+                GroupsActivity.this.refreshRecyclerView(uid);
+            }
             Intent checkRefresh = new Intent(GroupsActivity.this, GroupService.class);
             checkRefresh.putExtra(IntentKeys.UID, uid);
             checkRefresh.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
