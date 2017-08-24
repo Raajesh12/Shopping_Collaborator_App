@@ -212,7 +212,11 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                 }
             }
         });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         IntentFilter filter = new IntentFilter(ItemResponseReceiver.ACTION_RESP);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         receiver = new ItemResponseReceiver();
