@@ -50,7 +50,7 @@ public interface UserEndpoints {
     Call<Void> validateCurrentUser(@Body ValidateCurrentUserRequest validateCurrentUserRequest);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
-    @GET("/get_user_last_modified")
+    @GET("/user_last_modified")
     Call<LastModifiedResponse> getUserLastModified(@Query("uid") long uid);
 
     Retrofit retrofit = new Retrofit.Builder()

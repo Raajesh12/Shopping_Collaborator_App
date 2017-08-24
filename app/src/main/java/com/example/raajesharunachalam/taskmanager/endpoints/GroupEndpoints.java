@@ -6,6 +6,7 @@ import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
+import com.example.raajesharunachalam.taskmanager.responses.LastModifiedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
 import retrofit2.Call;
@@ -28,6 +29,10 @@ public interface GroupEndpoints {
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @GET("/groups")
     Call<GroupListResponse> getGroups(@Query("uid") long uid);
+
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @GET("/group_last_modified")
+    Call<LastModifiedResponse> getGroupLastModified(@Query("gid") long gid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/groups/")
