@@ -16,6 +16,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginLeft="20dp"
+        android:paddingBottom="20dp"
         android:textSize="30sp"
         tools:text="Vishnu's Group"
         tools:textColor="@color/navy_blue" />

@@ -2,7 +2,7 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#BDBDBD"
+    android:background="@color/gray_background"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -17,6 +17,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="80dp"
+        android:paddingBottom="20dp"
         tools:text="Vishnu Jaganathan"
         tools:textColor="#000080"/>
 
@@ -25,7 +26,6 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="2dp"
         android:background="@drawable/ic_cancel_black_24dp"
         app:layout_constraintLeft_toRightOf="@id/tv_name"
         app:layout_constraintTop_toTopOf="@id/tv_name"/>
