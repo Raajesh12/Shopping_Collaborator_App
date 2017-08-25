@@ -18,7 +18,8 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="15dp"
         android:textColor="#000080"
-        android:padding="10dp" >
+        android:paddingLeft="20dp"
+        android:paddingBottom="20dp" >
     </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.FloatingActionButton
@@ -29,6 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/recycle_group_users"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="@+id/recycle_group_users"
-        android:layout_marginRight="20dp"/>
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"/>
 
 </android.support.constraint.ConstraintLayout>
