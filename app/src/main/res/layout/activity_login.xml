@@ -30,8 +30,7 @@
         android:padding="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="raajstar3@gmail.com"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/passwordfield"
@@ -46,8 +45,7 @@
         android:padding="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/emailfield"
-        android:text="raajesh"/>
+        app:layout_constraintTop_toBottomOf="@id/emailfield" />
 
     <Button
         android:id="@+id/login_button"
