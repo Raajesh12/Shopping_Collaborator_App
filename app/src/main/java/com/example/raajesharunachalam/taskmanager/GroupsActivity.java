@@ -1,8 +1,10 @@
 package com.example.raajesharunachalam.taskmanager;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,11 +32,12 @@ import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.requests.CreateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateCurrentUserRequest;
-import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.Group;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
-import com.example.raajesharunachalam.taskmanager.responses.UIDResponse;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +49,10 @@ public class GroupsActivity extends AppCompatActivity {
     private RecyclerView rv;
     private GroupsAdapter groupsAdapter;
     private FloatingActionButton addGroupButton;
+
+    GroupResponseReceiver receiver;
+
+    Calendar lastRefreshed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -407,10 +415,16 @@ public class GroupsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter filter = new IntentFilter(GroupResponseReceiver.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new GroupResponseReceiver();
+        registerReceiver(receiver, filter);
+
         startCalls++;
         if (startCalls > 1) {
             refreshRecyclerView(uid);
         }
+
     }
 
     @Override
@@ -432,6 +446,13 @@ public class GroupsActivity extends AppCompatActivity {
                     Group[] groups = response.body().getGroups();
                     groupsAdapter = new GroupsAdapter(groups);
                     rv.setAdapter(groupsAdapter);
+
+                    lastRefreshed = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+
+                    Intent intent = new Intent(GroupsActivity.this, GroupService.class);
+                    intent.putExtra(IntentKeys.UID, uid);
+                    intent.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
+                    startService(intent);
                 } else {
                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
@@ -454,6 +475,8 @@ public class GroupsActivity extends AppCompatActivity {
                     Group[] groups = response.body().getGroups();
                     groupsAdapter.setGroups(groups);
                     groupsAdapter.notifyDataSetChanged();
+
+                    lastRefreshed = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
                 } else {
                     Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
@@ -464,6 +487,12 @@ public class GroupsActivity extends AppCompatActivity {
                 Toast.makeText(GroupsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
     }
 
     public class GroupsAdapter extends RecyclerView.Adapter<GroupViewHolder> {
@@ -525,6 +554,23 @@ public class GroupsActivity extends AppCompatActivity {
             super(itemView);
 
             groupName = (TextView) itemView.findViewById(R.id.group_name);
+        }
+    }
+
+    public class GroupResponseReceiver extends BroadcastReceiver {
+        public static final String ACTION_RESP = "Refresh RecyclerView";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("GroupService", "Broadcast Receiver onReceived()");
+            boolean shouldRefresh = intent.getBooleanExtra(IntentKeys.SHOULD_REFRESH, false);
+            if(shouldRefresh) {
+                GroupsActivity.this.refreshRecyclerView(uid);
+            }
+            Intent checkRefresh = new Intent(GroupsActivity.this, GroupService.class);
+            checkRefresh.putExtra(IntentKeys.UID, uid);
+            checkRefresh.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
+            startService(checkRefresh);
         }
     }
 }

@@ -6,6 +6,7 @@ import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
 import com.example.raajesharunachalam.taskmanager.responses.GIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.GroupListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
+import com.example.raajesharunachalam.taskmanager.responses.LastModifiedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
 import retrofit2.Call;
@@ -30,6 +31,10 @@ public interface GroupEndpoints {
     Call<GroupListResponse> getGroups(@Query("uid") long uid);
 
     @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @GET("/group_last_modified")
+    Call<LastModifiedResponse> getGroupLastModified(@Query("gid") long gid);
+
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
     @POST("/groups/")
     Call<GIDResponse> createGroup(@Body CreateGroupRequest createGroupRequest);
 
@@ -49,9 +54,8 @@ public interface GroupEndpoints {
     @GET("/items_completed")
     Call<ItemsCompletedResponse> getItemsCompleted(@Query("gid") long gid);
 
-
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://taskmanager.host")
+            .baseUrl("http://api.taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

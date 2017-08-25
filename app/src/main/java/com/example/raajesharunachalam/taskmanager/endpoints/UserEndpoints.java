@@ -4,6 +4,7 @@ import com.example.raajesharunachalam.taskmanager.requests.CreateUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateCurrentUserRequest;
 import com.example.raajesharunachalam.taskmanager.requests.ValidateUserRequest;
+import com.example.raajesharunachalam.taskmanager.responses.LastModifiedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.UIDResponse;
 import com.example.raajesharunachalam.taskmanager.responses.UserInfoResponse;
 
@@ -17,6 +18,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by raajesharunachalam on 8/11/17.
@@ -47,8 +49,12 @@ public interface UserEndpoints {
     @POST("/validate_current_user")
     Call<Void> validateCurrentUser(@Body ValidateCurrentUserRequest validateCurrentUserRequest);
 
+    @Headers("Token: 5c8ab94e-3c95-40f9-863d-e31ae49e5d8d")
+    @GET("/user_last_modified")
+    Call<LastModifiedResponse> getUserLastModified(@Query("uid") long uid);
+
     Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://taskmanager.host")
+            .baseUrl("http://api.taskmanager.host")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 

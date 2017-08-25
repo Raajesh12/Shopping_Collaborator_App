@@ -1,8 +1,10 @@
 package com.example.raajesharunachalam.taskmanager;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -24,15 +26,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.GroupEndpoints;
-import com.example.raajesharunachalam.taskmanager.endpoints.GroupUserEndpoints;
 import com.example.raajesharunachalam.taskmanager.endpoints.ItemEndpoints;
-import com.example.raajesharunachalam.taskmanager.requests.AddUserGroupRequest;
 import com.example.raajesharunachalam.taskmanager.requests.CreateItemRequest;
 import com.example.raajesharunachalam.taskmanager.requests.UpdateItemRequest;
 import com.example.raajesharunachalam.taskmanager.responses.Item;
@@ -41,8 +40,9 @@ import com.example.raajesharunachalam.taskmanager.responses.ItemListResponse;
 import com.example.raajesharunachalam.taskmanager.responses.ItemsCompletedResponse;
 import com.example.raajesharunachalam.taskmanager.responses.TotalPriceResponse;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -56,6 +56,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     private static boolean deleteMode = false;
     private static long gid;
     private static long uid;
+    Calendar lastRefreshed;
     RecyclerView rv;
     ItemsAdapter adapter;
     TextView itemsBought;
@@ -63,6 +64,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     Button deleteItems;
     FloatingActionButton addItem;
     HashSet<Long> itemsToDelete;
+    ItemResponseReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         Intent intent = getIntent();
         gid = intent.getLongExtra(IntentKeys.GID, 0L);
         uid = intent.getLongExtra(IntentKeys.UID, 0L);
+
 
         rv = (RecyclerView) findViewById(R.id.recycle_items);
         initializeScreen(gid);
@@ -212,6 +215,15 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(ItemResponseReceiver.ACTION_RESP);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        receiver = new ItemResponseReceiver();
+        registerReceiver(receiver, filter);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inf = getMenuInflater();
         inf.inflate(R.menu.items_menu, menu);
@@ -348,11 +360,15 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                     adapter = new ItemsAdapter(items);
                     rv.setAdapter(adapter);
                     initializeItemTouchHelper();
+                    lastRefreshed = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+                    Intent i = new Intent(ItemsActivity.this, ItemService.class);
+                    i.putExtra(IntentKeys.GID, gid);
+                    i.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
+                    startService(i);
                 } else {
                     Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onFailure(Call<ItemListResponse> call, Throwable t) {
                 Toast.makeText(ItemsActivity.this, R.string.call_failed, Toast.LENGTH_LONG).show();
@@ -585,6 +601,7 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
                         Item[] items = response.body().getItems();
                         adapter.setItems(items);
                         adapter.notifyDataSetChanged();
+                        lastRefreshed = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
                     } else {
                         Toast.makeText(ItemsActivity.this, R.string.server_error, Toast.LENGTH_LONG).show();
                     }
@@ -643,7 +660,13 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         }
     }
 
-    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder>{
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(receiver);
+    }
+
+    public class ItemsAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
         Item[] items;
         public ItemsAdapter(Item[] items){
@@ -752,6 +775,22 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         public ItemDeleteViewHolder(View itemView) {
             super(itemView);
             shouldDelete = (CheckBox) itemView.findViewById(R.id.should_delete);
+        }
+    }
+    public class ItemResponseReceiver extends BroadcastReceiver {
+        public static final String ACTION_RESP = "RecyclerView Refresh";
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            boolean shouldRefresh = intent.getBooleanExtra(IntentKeys.SHOULD_REFRESH, false);
+            if(shouldRefresh) {
+                ItemsActivity.this.refreshScreen(gid, true);
+            }
+            Intent checkRefresh = new Intent(ItemsActivity.this, ItemService.class);
+            checkRefresh.putExtra(IntentKeys.GID, gid);
+            checkRefresh.putExtra(IntentKeys.LAST_REFRESHED, lastRefreshed);
+            startService(checkRefresh);
         }
     }
 }

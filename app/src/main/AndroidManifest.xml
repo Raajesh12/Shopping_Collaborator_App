@@ -27,7 +27,15 @@
         <activity android:name=".GroupsActivity" />
         <activity android:name=".ItemsActivity" />
         <activity android:name=".UsersInGroupActivity" />
-        <activity android:name=".EditAccountInfo"></activity>
+        <activity android:name=".EditAccountInfo" />
+
+        <service
+            android:name=".GroupService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".ItemService"
+            android:exported="false"></service>
     </application>
 
 </manifest>
