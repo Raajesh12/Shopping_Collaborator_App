@@ -7,7 +7,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.raajesharunachalam.taskmanager.endpoints.UserEndpoints;
 import com.example.raajesharunachalam.taskmanager.responses.LastModifiedResponse;
@@ -36,7 +35,6 @@ public class GroupService extends IntentService {
         Calendar lastRefreshed = (Calendar) intent.getSerializableExtra(IntentKeys.LAST_REFRESHED);
         int count = 0;
         while(notRecentlyUpdated) {
-            Log.d("GroupService", "New Iteration Of Loop");
             Call<LastModifiedResponse> call = UserEndpoints.userEndpoints.getUserLastModified(uid);
             try {
                 Response<LastModifiedResponse> response = call.execute();

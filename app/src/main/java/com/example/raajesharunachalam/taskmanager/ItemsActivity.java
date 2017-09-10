@@ -15,7 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -85,7 +84,6 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
         deleteItems = (Button) findViewById(R.id.delete_items_button);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(ItemsActivity.this);
-        Log.d("SharedPreferences", String.valueOf(sharedPreferences.getBoolean(REFRESH_KEY, false)));
         sharedPreferences.edit().putBoolean(REFRESH_KEY, false).apply();
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
@@ -394,7 +392,6 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
 
 
         Call<ItemsCompletedResponse> itemsCompletedCall = GroupEndpoints.groupEndpoints.getItemsCompleted(gid);
-        Log.d("ItemsURL", itemsCompletedCall.request().url().toString());
         itemsCompletedCall.enqueue(new Callback<ItemsCompletedResponse>() {
             @Override
             public void onResponse(Call<ItemsCompletedResponse> call, Response<ItemsCompletedResponse> response) {
@@ -654,7 +651,6 @@ public class ItemsActivity extends AppCompatActivity implements SharedPreference
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(key.equals(REFRESH_KEY) && sharedPreferences.getBoolean(REFRESH_KEY, false) == true) {
-            Log.d("SharedPreferences", "Refreshed");
             sharedPreferences.edit().putBoolean(REFRESH_KEY, false).apply();
             refreshScreen(gid, true);
         }

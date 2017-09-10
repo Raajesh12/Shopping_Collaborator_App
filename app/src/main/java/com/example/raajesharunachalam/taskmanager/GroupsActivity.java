@@ -562,7 +562,6 @@ public class GroupsActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("GroupService", "Broadcast Receiver onReceived()");
             boolean shouldRefresh = intent.getBooleanExtra(IntentKeys.SHOULD_REFRESH, false);
             if(shouldRefresh) {
                 GroupsActivity.this.refreshRecyclerView(uid);

@@ -3,7 +3,6 @@ package com.example.raajesharunachalam.taskmanager;
 import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.raajesharunachalam.taskmanager.GroupsActivity;
 import com.example.raajesharunachalam.taskmanager.IntentKeys;
@@ -35,7 +34,6 @@ public class ItemService extends IntentService {
         long gid = intent.getLongExtra(IntentKeys.GID, 0L);
         Calendar lastRefreshed = (Calendar) intent.getSerializableExtra(IntentKeys.LAST_REFRESHED);
         while(notRecentlyUpdated) {
-            Log.d("ItemService", "New Iteration Of Loop");
             Call<LastModifiedResponse> call = GroupEndpoints.groupEndpoints.getGroupLastModified(gid);
             try {
                 Response<LastModifiedResponse> response = call.execute();
