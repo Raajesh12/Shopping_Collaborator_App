@@ -1,0 +1,2 @@
+# Shopping_Collaborator_App
+Android App built in August 2017. App allows users to create groups, add/remove other users from groups, and create shopping lists within the groups. Within each list, users can add, remove, or mark items as done and other devices will get real time updates. App also keeps track of statistics such as total spent, total items bought, etc. Backend Web API that was deployed to server and used to interact with the database by this app is in the Shopping_Colaborator_API repository
