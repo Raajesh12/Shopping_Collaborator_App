@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_background"
-    tools:context="com.example.raajesharunachalam.taskmanager.GroupsActivity">
+    tools:context="com.shopping.collaborator.app.GroupsActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycleGroups"

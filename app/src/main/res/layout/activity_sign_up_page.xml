@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_background"
-    tools:context="com.example.raajesharunachalam.taskmanager.SignUpPage">
+    tools:context="com.shopping.collaborator.app.SignUpPage">
 
     <EditText
         android:id="@+id/first_name"

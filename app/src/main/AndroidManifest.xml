@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.raajesharunachalam.taskmanager">
+    package="com.shopping.collaborator.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -8,10 +8,9 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="com.shopping.collaborator.app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,22 +18,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name="com.shopping.collaborator.app.LoginActivity"
             android:label="Login" />
         <activity
-            android:name=".SignUpPage"
+            android:name="com.shopping.collaborator.app.SignUpPage"
             android:label="Sign Up Page" />
-        <activity android:name=".GroupsActivity" />
-        <activity android:name=".ItemsActivity" />
-        <activity android:name=".UsersInGroupActivity" />
-        <activity android:name=".EditAccountInfo" />
+        <activity android:name="com.shopping.collaborator.app.GroupsActivity" />
+        <activity android:name="com.shopping.collaborator.app.ItemsActivity" />
+        <activity android:name="com.shopping.collaborator.app.UsersInGroupActivity" />
+        <activity android:name="com.shopping.collaborator.app.EditAccountInfo" />
 
         <service
-            android:name=".GroupService"
+            android:name="com.shopping.collaborator.app.GroupService"
             android:enabled="true"
             android:exported="false" />
         <service
-            android:name=".ItemService"
+            android:name="com.shopping.collaborator.app.ItemService"
             android:exported="false"></service>
     </application>
 
